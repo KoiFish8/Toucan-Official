@@ -1,0 +1,15 @@
+{
+  "name": "toucan-website",
+  "version": "1.0.0",
+  "description": "Toucan Music — free music lessons for every child (static site)",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i src/input.css -o styles.css --minify",
+    "watch": "tailwindcss -i src/input.css -o styles.css --watch"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "sharp": "^0.34.5",
+    "tailwindcss": "^3.4.17"
+  }
+}

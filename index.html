@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Toucan — Free music lessons for every child</title>
+  <meta name="description"
+    content="Toucan is a non-profit providing free music lessons for less privileged children. We Can Teach, You Can Learn." />
+  <link rel="icon" href="images/toucan.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="font-sans">
+  <!-- ============ HEADER ============ -->
+  <header class="sticky top-0 z-50 w-full border-b border-black/[0.08] backdrop-blur-xl"
+    style="background: rgba(250,250,247,0.8)">
+    <div class="mx-auto flex h-16 max-w-home items-center justify-between px-6">
+      <a href="#top" class="flex items-center gap-2.5 text-fg">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eceae4] shadow-sm">
+          <img src="images/toucan.png" alt="Toucan logo" width="175" height="200" class="h-6 w-6 object-contain" />
+        </span>
+        <span class="text-[16px] font-semibold tracking-tight">Toucan</span>
+      </a>
+      <nav class="hidden items-center gap-0.5 md:flex">
+        <a href="#mission"
+          class="rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg">Mission</a>
+        <a href="#offer"
+          class="rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg">What we do</a>
+        <a href="#tutors"
+          class="rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg">About us</a>
+        <a href="#involved"
+          class="rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg">Volunteer</a>
+        <a href="#contact"
+          class="rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg">Contact</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="#contact"
+          class="hidden rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg sm:block">Contact</a>
+        <a href="#involved"
+          class="glow-btn rounded-full bg-beak px-4 py-1.5 text-[13px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">Sign
+          up</a>
+        <!-- hamburger (mobile only) -->
+        <button id="menu-toggle" type="button" aria-label="Open menu" aria-controls="mobile-menu"
+          aria-expanded="false"
+          class="flex h-9 w-9 items-center justify-center rounded-md border border-black/10 text-fg transition-colors hover:bg-black/[0.05] md:hidden">
+          <svg id="menu-icon-open" viewBox="0 0 24 24" fill="none" class="h-5 w-5">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <svg id="menu-icon-close" viewBox="0 0 24 24" fill="none" class="hidden h-5 w-5">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- mobile menu panel -->
+    <nav id="mobile-menu"
+      class="hidden border-t border-black/[0.08] bg-bg px-6 py-3 md:hidden">
+      <a href="#mission"
+        class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">Mission</a>
+      <a href="#offer"
+        class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">What
+        we do</a>
+      <a href="#tutors"
+        class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">About
+        us</a>
+      <a href="#involved"
+        class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">Volunteer</a>
+      <a href="#contact"
+        class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">Contact</a>
+      <a href="#involved"
+        class="mt-2 block rounded-lg bg-beak px-3 py-2.5 text-center text-[15px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">Sign
+        up for lessons</a>
+    </nav>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section id="top" class="relative overflow-hidden pt-20 pb-24">
+    <div class="glow"></div>
+    <div class="relative mx-auto grid max-w-home items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
+      <div>
+        <span
+          class="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.02] py-1 pl-1.5 pr-3 text-[13px] text-fg2">
+          <span class="rounded-full bg-beak px-2 py-0.5 text-[11px] font-semibold text-[#08090a]">Non-profit</span>
+          Free music lessons for every child
+        </span>
+        <h1
+          class="reveal mt-6 text-balance text-[clamp(2.5rem,5.2vw,4rem)] font-semibold leading-[1.05] tracking-[-0.022em] text-fg"
+          data-dir="left">
+          We Can Teach,<br />You Can Learn.
+        </h1>
+        <p class="mt-6 max-w-md text-[17px] leading-relaxed text-fg3">
+          Toucan is a non-profit organization working hard to provide free
+          music lessons for less privileged children — so that cost is never
+          the reason a child can't make music.
+        </p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href="#involved"
+            class="glow-btn inline-flex h-11 items-center justify-center rounded-lg bg-beak px-5 text-[14px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">
+            Sign up for lessons
+          </a>
+          <a href="#involved"
+            class="glow-btn inline-flex h-11 items-center justify-center gap-1.5 rounded-lg border border-black/10 bg-black/[0.03] px-5 text-[14px] font-medium text-fg transition-colors hover:bg-black/[0.05]">
+            Volunteer with us
+            <svg viewBox="0 0 16 16" fill="none" class="h-4 w-4 text-fg3">
+              <path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- hero photo -->
+      <div class="relative">
+        <div
+          class="rounded-2xl border border-black/[0.08] bg-surface p-1.5 shadow-[0_30px_120px_-20px_rgba(245,196,81,0.22)]">
+          <img src="images/homeimg.webp" alt="A young student practicing the violin" width="1200" height="900"
+            fetchpriority="high" decoding="async"
+            class="aspect-[4/3] w-full rounded-xl border border-black/[0.07] object-cover" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MISSION (centered) ============ -->
+  <section id="mission" class="relative pt-28 pb-24 text-center">
+    <div class="mx-auto max-w-home px-6">
+      <span
+        class="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-[#eceae4] shadow-[0_10px_50px_-8px_rgba(245,196,81,0.25)]">
+        <img src="images/toucan.png" alt="" width="175" height="200" loading="lazy" decoding="async"
+          class="h-14 w-14 object-contain" />
+      </span>
+      <h2
+        class="reveal mx-auto max-w-3xl text-balance text-[clamp(1.9rem,4vw,2.85rem)] font-semibold leading-[1.1] tracking-[-0.022em] text-fg"
+        data-dir="down">
+        Music belongs to every child
+      </h2>
+      <p class="mx-auto mt-5 max-w-xl text-[16px] leading-relaxed text-fg3">
+        Toucan was started by a group of friends who saw the cost of music
+        education keep talented kids on the sidelines. We give underserved
+        youth free lessons — and the joy, discipline, and community that come
+        with learning an instrument.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ WHAT WE DO (3 cards) ============ -->
+  <section id="offer" class="border-t border-black/[0.06] py-28">
+    <div class="mx-auto max-w-home px-6">
+      <div class="max-w-xl">
+        <span class="text-[13px] font-semibold text-beak">What we do</span>
+        <h2
+          class="reveal mt-3 text-[clamp(1.75rem,3vw,2.25rem)] font-semibold leading-[1.15] tracking-[-0.022em] text-fg"
+          data-dir="left">
+          Lessons that don't cost a thing
+        </h2>
+        <p class="mt-4 text-[15px] leading-relaxed text-fg3">
+          Every Toucan student is paired with a dedicated tutor for free,
+          one-on-one lessons on the instrument they want to learn.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-4 md:grid-cols-3">
+        <!-- card -->
+        <div
+          class="glow-box rounded-2xl border border-black/[0.07] bg-surface p-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-beak/15 text-beak">
+            <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
+              <path d="M9 18V5l11-2v13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.6" />
+              <circle cx="17" cy="16" r="3" stroke="currentColor" stroke-width="1.6" />
+            </svg>
+          </div>
+          <h3 class="mt-4 text-[16px] font-semibold text-fg">100% free lessons</h3>
+          <p class="mt-2 text-[14px] leading-relaxed text-fg3">
+            No fees, ever. We exist so that money is never a barrier to a child
+            learning music.
+          </p>
+        </div>
+        <div
+          class="glow-box rounded-2xl border border-black/[0.07] bg-surface p-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-face/15 text-face">
+            <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
+              <circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6" />
+              <path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 6.5a3 3 0 0 1 0 5.8M18.5 19a5 5 0 0 0-3-4.6" stroke="currentColor"
+                stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h3 class="mt-4 text-[16px] font-semibold text-fg">One-on-one tutoring</h3>
+          <p class="mt-2 text-[14px] leading-relaxed text-fg3">
+            Personalized attention from a tutor who meets each student where
+            they are and grows with them.
+          </p>
+        </div>
+        <div
+          class="glow-box rounded-2xl border border-black/[0.07] bg-surface p-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-leaf/15 text-leaf">
+            <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
+              <path d="M12 3v13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              <path d="M12 6c2.5-2.5 6-2.5 6-2.5s.5 4-2 6.5M9 19a3 3 0 1 1-3-3" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h3 class="mt-4 text-[16px] font-semibold text-fg">Piano, violin, viola &amp; cello</h3>
+          <p class="mt-2 text-[14px] leading-relaxed text-fg3">
+            Our tutors teach a range of instruments, so students can learn the
+            one they're most excited about.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TUTORS / ABOUT ============ -->
+  <section id="tutors" class="border-t border-black/[0.06] py-28">
+    <div class="mx-auto max-w-home px-6">
+      <div class="max-w-xl">
+        <span class="text-[13px] font-semibold text-face">About us</span>
+        <h2
+          class="reveal mt-3 text-[clamp(1.75rem,3vw,2.25rem)] font-semibold leading-[1.15] tracking-[-0.022em] text-fg"
+          data-dir="left">
+          Taught by passionate<br />student musicians
+        </h2>
+        <p class="mt-4 text-[15px] leading-relaxed text-fg3">
+          Toucan is run by a small team of friends who love music and believe
+          it should be available to everyone.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Nathan -->
+        <div class="glow-box overflow-hidden rounded-2xl border border-black/[0.07] bg-surface">
+          <img src="images/nathan.webp" alt="Nathan" width="600" height="800" loading="lazy" decoding="async" class="aspect-[3/4] w-full object-cover" />
+          <div class="p-4">
+            <div class="text-[15px] font-semibold text-fg">Nathan</div>
+            <div class="text-[12.5px] font-medium text-beak">Founder &amp; Piano Tutor</div>
+            <p class="mt-2 text-[13px] leading-relaxed text-fg3">
+              9 years of piano and 3 years of viola. Outside music he's into
+              art, long-distance running, and basketball.
+            </p>
+          </div>
+        </div>
+        <!-- Sean -->
+        <div class="glow-box overflow-hidden rounded-2xl border border-black/[0.07] bg-surface">
+          <img src="images/sean.webp" alt="Sean" width="600" height="800" loading="lazy" decoding="async" class="aspect-[3/4] w-full object-cover" />
+          <div class="p-4">
+            <div class="text-[15px] font-semibold text-fg">Sean</div>
+            <div class="text-[12.5px] font-medium text-beak">Co-Founder, Head of Tech &amp; Viola Tutor</div>
+            <p class="mt-2 text-[13px] leading-relaxed text-fg3">
+              8 years of viola and violin. He enjoys programming and hockey.
+            </p>
+          </div>
+        </div>
+        <!-- Bryan -->
+        <div class="glow-box overflow-hidden rounded-2xl border border-black/[0.07] bg-surface">
+          <img src="images/bran.webp" alt="Bryan" width="600" height="800" loading="lazy" decoding="async" class="aspect-[3/4] w-full object-cover" />
+          <div class="p-4">
+            <div class="text-[15px] font-semibold text-fg">Bryan</div>
+            <div class="text-[12.5px] font-medium text-beak">Co-Founder, Violin &amp; Cello Tutor</div>
+            <p class="mt-2 text-[13px] leading-relaxed text-fg3">
+              8 years of violin and 3 years of cello. He loves swimming.
+            </p>
+          </div>
+        </div>
+        <!-- Sameer -->
+        <div class="glow-box overflow-hidden rounded-2xl border border-black/[0.07] bg-surface">
+          <img src="images/asm.webp" alt="Sameer" width="600" height="800" loading="lazy" decoding="async" class="aspect-[3/4] w-full object-cover" />
+          <div class="p-4">
+            <div class="text-[15px] font-semibold text-fg">Sameer</div>
+            <div class="text-[12.5px] font-medium text-beak">Co-Founder &amp; Graphic Designer</div>
+            <p class="mt-2 text-[13px] leading-relaxed text-fg3">
+              Brings the Toucan brand to life. Into 3D modeling, mathematics,
+              and guitar.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GET INVOLVED ============ -->
+  <section id="involved" class="border-t border-black/[0.06] py-28">
+    <div class="mx-auto max-w-home px-6">
+      <div class="max-w-xl">
+        <span class="text-[13px] font-semibold text-leaf">Get involved</span>
+        <h2
+          class="reveal mt-3 text-[clamp(1.75rem,3vw,2.25rem)] font-semibold leading-[1.15] tracking-[-0.022em] text-fg"
+          data-dir="left">
+          Join the Toucan family
+        </h2>
+      </div>
+
+      <div class="mt-12 grid gap-6 lg:grid-cols-2">
+
+        <!-- ── SIGN UP FORM ── -->
+        <div id="signup-card"
+          class="glow-box rounded-2xl border border-black/[0.07] bg-surface p-8">
+          <h3 class="text-[18px] font-semibold text-fg">Sign up for free lessons</h3>
+          <p class="mt-2 text-[14px] leading-relaxed text-fg3">
+            Know a child who'd love to learn an instrument? Fill out the form
+            and we'll match them with a tutor at no cost.
+          </p>
+
+          <form id="signup-form" class="mt-6 space-y-4" action="https://formspree.io/f/xqeopewq" method="POST">
+            <input type="hidden" name="_subject" value="New lesson sign-up — Toucan" />
+            <div class="form-row">
+              <div>
+                <label for="s-child-name">Child's name <span class="text-beak">*</span></label>
+                <input id="s-child-name" name="child_name" type="text" class="field" placeholder="First and last"
+                  required />
+              </div>
+              <div>
+                <label for="s-child-age">Child's age <span class="text-beak">*</span></label>
+                <input id="s-child-age" name="child_age" type="number" min="3" max="18" class="field"
+                  placeholder="e.g. 8" required />
+              </div>
+            </div>
+            <div>
+              <label for="s-parent-name">Parent / guardian name <span class="text-beak">*</span></label>
+              <input id="s-parent-name" name="parent_name" type="text" class="field" placeholder="Your name" required />
+            </div>
+            <div>
+              <label for="s-email">Your email <span class="text-beak">*</span></label>
+              <input id="s-email" name="email" type="email" class="field" placeholder="you@example.com" required />
+            </div>
+            <div>
+              <label for="s-instrument">Instrument interested in <span class="text-beak">*</span></label>
+              <select id="s-instrument" name="instrument" class="field" required>
+                <option value="" disabled selected>Choose an instrument…</option>
+                <option>Piano</option>
+                <option>Violin</option>
+                <option>Viola</option>
+                <option>Cello</option>
+                <option>Not sure yet</option>
+              </select>
+            </div>
+            <div>
+              <label for="s-notes">Anything else we should know? <span class="text-fg4">(optional)</span></label>
+              <textarea id="s-notes" name="notes" class="field"
+                placeholder="Scheduling preferences, prior experience, etc."></textarea>
+            </div>
+            <button type="submit"
+              class="glow-btn w-full rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">
+              Sign up for free lessons
+            </button>
+          </form>
+        </div>
+
+        <!-- ── VOLUNTEER FORM ── -->
+        <div id="volunteer-card"
+          class="glow-box rounded-2xl border border-black/[0.07] bg-surface p-8">
+          <h3 class="text-[18px] font-semibold text-fg">Volunteer as a tutor</h3>
+          <p class="mt-2 text-[14px] leading-relaxed text-fg3">
+            We'd really appreciate your help. Share your musical talent and
+            teach a child for free — it only takes a few hours a month.
+          </p>
+
+          <form id="volunteer-form" class="mt-6 space-y-4" action="https://formspree.io/f/xqeopewq" method="POST">
+            <input type="hidden" name="_subject" value="New volunteer application — Toucan" />
+            <div class="form-row">
+              <div>
+                <label for="v-name">Your name <span class="text-beak">*</span></label>
+                <input id="v-name" name="name" type="text" class="field" placeholder="First and last" required />
+              </div>
+              <div>
+                <label for="v-email">Your email <span class="text-beak">*</span></label>
+                <input id="v-email" name="email" type="email" class="field" placeholder="you@example.com" required />
+              </div>
+            </div>
+            <div>
+              <label>Instruments you can teach <span class="text-beak">*</span></label>
+              <div class="checkbox-group mt-1.5">
+                <label><input type="checkbox" name="instruments" value="Piano" /> Piano</label>
+                <label><input type="checkbox" name="instruments" value="Violin" /> Violin</label>
+                <label><input type="checkbox" name="instruments" value="Viola" /> Viola</label>
+                <label><input type="checkbox" name="instruments" value="Cello" /> Cello</label>
+              </div>
+            </div>
+            <div>
+              <label for="v-experience">Years of experience <span class="text-beak">*</span></label>
+              <select id="v-experience" name="experience" class="field" required>
+                <option value="" disabled selected>Select…</option>
+                <option value="1-3">1 – 3 years</option>
+                <option value="4-6">4 – 6 years</option>
+                <option value="7-10">7 – 10 years</option>
+                <option value="10+">10+ years</option>
+              </select>
+            </div>
+            <div>
+              <label for="v-availability">Availability <span class="text-beak">*</span></label>
+              <textarea id="v-availability" name="availability" class="field"
+                placeholder="e.g. weekends, Tuesday evenings" required></textarea>
+            </div>
+            <div>
+              <label for="v-about">Anything else? <span class="text-fg4">(optional)</span></label>
+              <textarea id="v-about" name="about" class="field"
+                placeholder="Tell us a bit about yourself or why you'd like to volunteer."></textarea>
+            </div>
+            <button type="submit"
+              class="glow-btn w-full rounded-lg border border-black/10 bg-black/[0.04] py-2.5 text-[14px] font-medium text-fg transition-colors hover:bg-black/[0.07]">
+              Apply to volunteer
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="relative overflow-hidden border-t border-black/[0.06] py-28 text-center">
+    <div class="glow"></div>
+    <div class="relative mx-auto max-w-home px-6">
+      <h2
+        class="reveal mx-auto max-w-2xl text-[clamp(2rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.022em] text-fg"
+        data-dir="down">
+        Let's make music together
+      </h2>
+      <p class="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-fg3">
+        Questions about lessons or volunteering? Reach out — we'd love to hear
+        from you.
+      </p>
+      <a href="https://mail.google.com/mail/?view=cm&to=toucanexec@gmail.com&su=Question%20about%20Toucan%20Music"
+        target="_blank" rel="noopener noreferrer"
+        class="glow-btn mt-8 inline-flex h-11 items-center justify-center rounded-lg bg-beak px-6 text-[14px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">
+        Email us at toucanexec@gmail.com
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="border-t border-black/[0.07] py-14">
+    <div class="mx-auto flex max-w-home flex-col items-start justify-between gap-6 px-6 sm:flex-row sm:items-center">
+      <div class="flex items-center gap-2.5 text-fg">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eceae4] shadow-sm">
+          <img src="images/toucan.png" alt="Toucan logo" width="175" height="200" loading="lazy" decoding="async"
+            class="h-6 w-6 object-contain" />
+        </span>
+        <span class="text-[16px] font-semibold tracking-tight">Toucan</span>
+      </div>
+      <nav class="flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-fg3">
+        <a href="#mission" class="hover:text-fg">Mission</a>
+        <a href="#offer" class="hover:text-fg">What we do</a>
+        <a href="#tutors" class="hover:text-fg">About us</a>
+        <a href="#involved" class="hover:text-fg">Volunteer</a>
+        <a href="mailto:toucanexec@gmail.com" class="hover:text-fg">Contact</a>
+      </nav>
+    </div>
+    <div class="mx-auto mt-8 max-w-home px-6 text-[12.5px] text-fg4">
+      © <span id="year"></span> Toucan · We Can Teach, You Can Learn. · A non-profit providing free music lessons for
+      less privileged children.
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ── Mobile hamburger menu ── */
+    (function () {
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('mobile-menu');
+      const iconOpen = document.getElementById('menu-icon-open');
+      const iconClose = document.getElementById('menu-icon-close');
+      if (!toggle || !menu) return;
+
+      function setOpen(open) {
+        menu.classList.toggle('hidden', !open);
+        iconOpen.classList.toggle('hidden', open);
+        iconClose.classList.toggle('hidden', !open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      }
+
+      toggle.addEventListener('click', () => setOpen(menu.classList.contains('hidden')));
+      // Close when a link is tapped
+      menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+      // Close if resized up to desktop
+      window.addEventListener('resize', () => { if (window.innerWidth >= 768) setOpen(false); });
+    })();
+
+    /* ── Scroll-reveal headings (blur + slide + fade) ── */
+    (function () {
+      const els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || !els.length) {
+        els.forEach((el) => el.classList.add('is-visible'));
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target); // animate once
+            }
+          });
+        },
+        { threshold: 0.3, rootMargin: '0px 0px -200px 0px' }
+      );
+      els.forEach((el) => io.observe(el));
+    })();
+  </script>
+</body>
+
+</html>
