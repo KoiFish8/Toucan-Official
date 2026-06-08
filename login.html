@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Log in — Toucan</title>
+  <link rel="icon" href="images/toucan.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet" />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Tailwind CDN with Toucan color tokens -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#fafaf7', surface: '#ffffff', surface2: '#f4f4f0',
+            border: '#ecece8', border2: '#e0e0da',
+            fg: '#1c1d21', fg2: '#3a3b41', fg3: '#6b6f76', fg4: '#9aa0a6',
+            beak: '#f5c451', beakdeep: '#e9a93b', face: '#4f6db8', leaf: '#4e9e5e',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+</head>
+
+<body class="bg-bg font-sans text-fg">
+
+  <!-- ── HEADER ── -->
+  <header class="sticky top-0 z-50 w-full border-b border-black/[0.08] backdrop-blur-xl"
+    style="background: rgba(250,250,247,0.8)">
+    <div class="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+      <a href="index.html" class="flex items-center gap-2.5 text-fg">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eceae4] shadow-sm">
+          <img src="images/toucan.png" alt="Toucan logo" width="175" height="200" class="h-6 w-6 object-contain" />
+        </span>
+        <span class="text-[16px] font-semibold tracking-tight">Toucan</span>
+      </a>
+      <a href="index.html" class="text-[13px] text-fg3 transition hover:text-fg">← Back to home</a>
+    </div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="mx-auto flex max-w-md flex-col px-6 py-16">
+
+    <div class="rounded-2xl border border-border bg-surface p-8 shadow-sm">
+      <h1 id="title" class="text-[22px] font-semibold tracking-tight">Welcome back</h1>
+      <p id="subtitle" class="mt-1 text-[14px] text-fg3">Log in to book lessons and manage your account.</p>
+
+      <!-- Google -->
+      <button id="google-btn" type="button"
+        class="mt-6 flex w-full items-center justify-center gap-2.5 rounded-lg border border-border2 bg-surface py-2.5 text-[14px] font-medium text-fg transition hover:bg-surface2">
+        <svg viewBox="0 0 24 24" class="h-[18px] w-[18px]">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <!-- divider -->
+      <div class="my-5 flex items-center gap-3 text-[12px] text-fg4">
+        <span class="h-px flex-1 bg-border"></span>or<span class="h-px flex-1 bg-border"></span>
+      </div>
+
+      <!-- Email / password form -->
+      <form id="auth-form" class="space-y-4">
+        <!-- name (sign-up only) -->
+        <div id="name-field" class="hidden">
+          <label class="mb-1 block text-[13px] font-medium text-fg2">Your name</label>
+          <input id="name" type="text" autocomplete="name" placeholder="First and last"
+            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+        </div>
+        <div>
+          <label class="mb-1 block text-[13px] font-medium text-fg2">Email</label>
+          <input id="email" type="email" required autocomplete="email" placeholder="you@example.com"
+            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+        </div>
+        <div>
+          <label class="mb-1 block text-[13px] font-medium text-fg2">Password</label>
+          <input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters"
+            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+        </div>
+
+        <p id="message" class="hidden text-[13px]"></p>
+
+        <button type="submit" id="submit-btn"
+          class="w-full rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+          Log in
+        </button>
+      </form>
+
+      <!-- toggle between login / signup -->
+      <p class="mt-5 text-center text-[13px] text-fg3">
+        <span id="toggle-text">Don't have an account?</span>
+        <button id="toggle-btn" type="button" class="font-semibold text-face hover:underline">Sign up</button>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    // ── Supabase setup ──
+    const SUPABASE_URL  = 'https://avzvaemuvnieulukkyby.supabase.co'
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2enZhZW11dm5pZXVsdWtreWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4Njk1NDQsImV4cCI6MjA5NjQ0NTU0NH0.1K6omaUjfY5dqlUhwA9LSj53ewfiFknQN71dj5Kt3rU'
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+
+    // Where to send people once they're logged in (works locally + deployed)
+    const ACCOUNT_URL = new URL('account.html', window.location.href).href
+
+    let mode = 'login'   // 'login' or 'signup'
+
+    // If already logged in, skip straight to the account page
+    db.auth.getSession().then(({ data }) => {
+      if (data.session) window.location.href = ACCOUNT_URL
+    })
+
+    // ── Toggle between Log in and Sign up ──
+    const els = {
+      title:    document.getElementById('title'),
+      subtitle: document.getElementById('subtitle'),
+      submit:   document.getElementById('submit-btn'),
+      toggleText: document.getElementById('toggle-text'),
+      toggleBtn:  document.getElementById('toggle-btn'),
+      nameField:  document.getElementById('name-field'),
+      password:   document.getElementById('password'),
+      message:    document.getElementById('message'),
+    }
+
+    document.getElementById('toggle-btn').addEventListener('click', () => {
+      mode = (mode === 'login') ? 'signup' : 'login'
+      const signup = mode === 'signup'
+      els.title.textContent    = signup ? 'Create your account' : 'Welcome back'
+      els.subtitle.textContent = signup ? 'Sign up to start booking free lessons.' : 'Log in to book lessons and manage your account.'
+      els.submit.textContent   = signup ? 'Sign up' : 'Log in'
+      els.toggleText.textContent = signup ? 'Already have an account?' : "Don't have an account?"
+      els.toggleBtn.textContent  = signup ? 'Log in' : 'Sign up'
+      els.nameField.classList.toggle('hidden', !signup)
+      els.password.setAttribute('autocomplete', signup ? 'new-password' : 'current-password')
+      hideMessage()
+    })
+
+    // ── Email / password submit ──
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      hideMessage()
+      const email = document.getElementById('email').value.trim()
+      const password = document.getElementById('password').value
+      const fullName = document.getElementById('name').value.trim()
+
+      els.submit.disabled = true
+      els.submit.textContent = mode === 'signup' ? 'Creating account…' : 'Logging in…'
+
+      if (mode === 'signup') {
+        // Create the account. The database trigger auto-creates a "profile"
+        // row with role = 'parent'. full_name is saved in the user's metadata.
+        const { data, error } = await db.auth.signUp({
+          email, password,
+          options: { data: { full_name: fullName } },
+        })
+        if (error) return fail(error.message)
+
+        if (data.session) {
+          // Email confirmation is OFF → we're logged in immediately
+          window.location.href = ACCOUNT_URL
+        } else {
+          // Email confirmation is ON → user must click a link in their email
+          succeed('Check your email to confirm your account, then come back and log in.')
+          resetBtn()
+        }
+      } else {
+        const { error } = await db.auth.signInWithPassword({ email, password })
+        if (error) return fail(error.message)
+        window.location.href = ACCOUNT_URL
+      }
+    })
+
+    // ── Google sign-in ──
+    document.getElementById('google-btn').addEventListener('click', async () => {
+      hideMessage()
+      const { error } = await db.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: ACCOUNT_URL },
+      })
+      // On success the browser redirects to Google, so we only get here on error
+      if (error) fail(error.message)
+    })
+
+    // ── Helpers ──
+    function fail(msg) {
+      els.message.textContent = msg
+      els.message.className = 'text-[13px] text-red-500'
+      resetBtn()
+    }
+    function succeed(msg) {
+      els.message.textContent = msg
+      els.message.className = 'text-[13px] text-leaf'
+    }
+    function hideMessage() { els.message.className = 'hidden text-[13px]' }
+    function resetBtn() {
+      els.submit.disabled = false
+      els.submit.textContent = mode === 'signup' ? 'Sign up' : 'Log in'
+    }
+  </script>
+
+</body>
+</html>
