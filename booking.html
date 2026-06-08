@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book a Lesson — Toucan</title>
+  <link rel="icon" href="images/toucan.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet" />
+
+  <!-- FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Tailwind CDN with Toucan color tokens -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg:       '#fafaf7',
+            surface:  '#ffffff',
+            surface2: '#f4f4f0',
+            border:   '#ecece8',
+            border2:  '#e0e0da',
+            fg:       '#1c1d21',
+            fg2:      '#3a3b41',
+            fg3:      '#6b6f76',
+            fg4:      '#9aa0a6',
+            beak:     '#f5c451',
+            beakdeep: '#e9a93b',
+            face:     '#4f6db8',
+            leaf:     '#4e9e5e',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+</head>
+
+<body class="bg-bg font-sans text-fg">
+
+  <!-- ── HEADER ── -->
+  <header class="sticky top-0 z-50 w-full border-b border-black/[0.08] backdrop-blur-xl"
+    style="background: rgba(250,250,247,0.8)">
+    <div class="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+      <a href="index.html" class="flex items-center gap-2.5 text-fg">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eceae4] shadow-sm">
+          <img src="images/toucan.png" alt="Toucan logo" width="175" height="200" class="h-6 w-6 object-contain" />
+        </span>
+        <span class="text-[16px] font-semibold tracking-tight">Toucan</span>
+      </a>
+      <a href="index.html" class="text-[13px] text-fg3 transition hover:text-fg">← Back to home</a>
+    </div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="mx-auto max-w-5xl px-6 py-16">
+
+    <!-- Page heading -->
+    <div class="mb-10">
+      <h1 class="text-[clamp(1.75rem,3vw,2.25rem)] font-semibold tracking-tight">Book a free lesson</h1>
+      <p class="mt-2 text-[15px] text-fg3">Pick an instrument, choose a time slot, and we'll lock it in for you — totally free.</p>
+    </div>
+
+    <!-- ── STEP 1: Instrument ── -->
+    <div>
+      <p class="mb-4 text-[12px] font-semibold uppercase tracking-widest text-fg4">Step 1 — Choose an instrument</p>
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+
+        <button onclick="selectInstrument('Piano')"
+          class="instrument-btn rounded-xl border-2 border-border bg-surface p-5 text-left transition hover:border-beak hover:shadow-sm"
+          data-instrument="Piano">
+          <div class="mb-2 text-2xl">🎹</div>
+          <div class="font-semibold">Piano</div>
+          <div class="text-[13px] text-fg3">Taught by Nathan</div>
+        </button>
+
+        <button onclick="selectInstrument('Violin')"
+          class="instrument-btn rounded-xl border-2 border-border bg-surface p-5 text-left transition hover:border-beak hover:shadow-sm"
+          data-instrument="Violin">
+          <div class="mb-2 text-2xl">🎻</div>
+          <div class="font-semibold">Violin</div>
+          <div class="text-[13px] text-fg3">Taught by Bryan</div>
+        </button>
+
+        <button onclick="selectInstrument('Viola')"
+          class="instrument-btn rounded-xl border-2 border-border bg-surface p-5 text-left transition hover:border-beak hover:shadow-sm"
+          data-instrument="Viola">
+          <div class="mb-2 text-2xl">🎻</div>
+          <div class="font-semibold">Viola</div>
+          <div class="text-[13px] text-fg3">Taught by Sean</div>
+        </button>
+
+        <button onclick="selectInstrument('Cello')"
+          class="instrument-btn rounded-xl border-2 border-border bg-surface p-5 text-left transition hover:border-beak hover:shadow-sm"
+          data-instrument="Cello">
+          <div class="mb-2 text-2xl">🎻</div>
+          <div class="font-semibold">Cello</div>
+          <div class="text-[13px] text-fg3">Taught by Bryan</div>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Calendar (hidden until instrument selected) ── -->
+    <div id="step-calendar" class="mt-12 hidden">
+      <p class="mb-4 text-[12px] font-semibold uppercase tracking-widest text-fg4">Step 2 — Pick a time slot</p>
+      <p id="loading-msg" class="text-[14px] text-fg3">Loading available slots…</p>
+      <div id="no-slots-msg" class="hidden rounded-xl border border-border bg-surface p-6 text-[14px] text-fg3">
+        No available slots right now. Check back soon or <a href="mailto:toucanexec@gmail.com" class="text-face underline">email us</a>.
+      </div>
+      <div id="calendar" class="hidden rounded-xl border border-border bg-surface p-4"></div>
+    </div>
+
+  </main>
+
+  <!-- ── BOOKING MODAL ── -->
+  <div id="modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-2xl bg-surface p-8 shadow-2xl">
+
+      <h3 class="text-[18px] font-semibold" id="modal-title">Book this slot</h3>
+      <p class="mt-1 text-[14px] text-fg3" id="modal-subtitle"></p>
+
+      <form id="booking-form" class="mt-6 space-y-4">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="mb-1 block text-[13px] font-medium text-fg2">Child's name <span class="text-beak">*</span></label>
+            <input id="b-child-name" type="text" required placeholder="First and last"
+              class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+          </div>
+          <div>
+            <label class="mb-1 block text-[13px] font-medium text-fg2">Age <span class="text-beak">*</span></label>
+            <input id="b-child-age" type="number" min="3" max="18" required placeholder="e.g. 8"
+              class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+          </div>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-[13px] font-medium text-fg2">Parent / guardian name <span class="text-beak">*</span></label>
+          <input id="b-parent-name" type="text" required placeholder="Your full name"
+            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-[13px] font-medium text-fg2">Your email <span class="text-beak">*</span></label>
+          <input id="b-parent-email" type="email" required placeholder="you@example.com"
+            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-[13px] font-medium text-fg2">Notes <span class="text-fg4">(optional)</span></label>
+          <textarea id="b-notes" placeholder="Prior experience, scheduling preferences, anything else…"
+            class="h-20 w-full resize-none rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20"></textarea>
+        </div>
+
+        <p id="form-error" class="hidden text-[13px] text-red-500"></p>
+
+        <div class="flex gap-3 pt-1">
+          <button type="button" onclick="closeModal()"
+            class="flex-1 rounded-lg border border-border py-2.5 text-[14px] font-medium text-fg3 transition hover:bg-surface2">
+            Cancel
+          </button>
+          <button type="submit" id="submit-btn"
+            class="flex-1 rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+            Confirm booking
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ── SUCCESS OVERLAY ── -->
+  <div id="success"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-2xl bg-surface p-10 text-center shadow-2xl">
+      <div class="mb-4 text-5xl">🎉</div>
+      <h3 class="text-[20px] font-semibold">You're booked!</h3>
+      <p class="mt-2 text-[14px] text-fg3">
+        We've sent a confirmation to your email. We'll see you at your lesson!
+      </p>
+      <a href="index.html"
+        class="mt-6 inline-block rounded-lg bg-beak px-6 py-2.5 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+        Back to home
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // ── Supabase setup ──
+    // SUPABASE_URL: the address of your Supabase project
+    // SUPABASE_ANON: a public key that lets the browser talk to your database
+    const SUPABASE_URL  = 'https://avzvaemuvnieulukkyby.supabase.co'
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2enZhZW11dm5pZXVsdWtreWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4Njk1NDQsImV4cCI6MjA5NjQ0NTU0NH0.1K6omaUjfY5dqlUhwA9LSj53ewfiFknQN71dj5Kt3rU'
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+
+    let calendar    = null   // the FullCalendar instance
+    let selectedSlot = null  // the slot the user clicked
+
+    // ─────────────────────────────────────────
+    // STEP 1: User picks an instrument
+    // ─────────────────────────────────────────
+    async function selectInstrument(instrument) {
+
+      // Highlight the selected button
+      document.querySelectorAll('.instrument-btn').forEach(btn => {
+        const active = btn.dataset.instrument === instrument
+        btn.classList.toggle('border-beak',   active)
+        btn.classList.toggle('border-border', !active)
+        btn.classList.toggle('shadow-sm',     active)
+      })
+
+      // Show the calendar section and reset its state
+      document.getElementById('step-calendar').classList.remove('hidden')
+      document.getElementById('loading-msg').classList.remove('hidden')
+      document.getElementById('no-slots-msg').classList.add('hidden')
+      document.getElementById('calendar').classList.add('hidden')
+
+      // 1. Find the tutor for this instrument
+      //    We're asking Supabase: "give me rows from tutors where instrument = ?"
+      const { data: tutors, error: tutorErr } = await db
+        .from('tutors')
+        .select('id, name')
+        .eq('instrument', instrument)
+        .limit(1)
+
+      if (tutorErr || !tutors.length) {
+        document.getElementById('loading-msg').textContent = 'No tutor found for this instrument yet.'
+        return
+      }
+
+      const tutor = tutors[0]
+
+      // 2. Fetch available (unbooked) slots for that tutor
+      //    We ask: "give me rows from slots where tutor_id = ? AND is_booked = false"
+      const { data: slots, error: slotsErr } = await db
+        .from('slots')
+        .select('id, date, start_time')
+        .eq('tutor_id', tutor.id)
+        .eq('is_booked', false)
+        .order('date', { ascending: true })
+
+      document.getElementById('loading-msg').classList.add('hidden')
+
+      if (slotsErr) {
+        document.getElementById('loading-msg').classList.remove('hidden')
+        document.getElementById('loading-msg').textContent = 'Error loading slots. Try again.'
+        return
+      }
+
+      if (!slots.length) {
+        document.getElementById('no-slots-msg').classList.remove('hidden')
+        return
+      }
+
+      // 3. Convert slots into FullCalendar "events"
+      //    FullCalendar needs { id, title, start, end } objects
+      const events = slots.map(slot => ({
+        id:              slot.id,
+        title:           `${instrument} with ${tutor.name}`,
+        start:           `${slot.date}T${slot.start_time}`,
+        end:             `${slot.date}T${addOneHour(slot.start_time)}`,
+        backgroundColor: '#f5c451',
+        borderColor:     '#e9a93b',
+        textColor:       '#08090a',
+        extendedProps:   { tutorName: tutor.name, instrument },
+      }))
+
+      // 4. Find the first slot's date so the calendar opens there
+      const firstDate = slots[0].date
+
+      // 5. Render the calendar
+      const calEl = document.getElementById('calendar')
+      calEl.classList.remove('hidden')
+
+      if (calendar) calendar.destroy()  // tear down old calendar if switching instruments
+
+      calendar = new FullCalendar.Calendar(calEl, {
+        initialView:  'dayGridMonth',   // month grid — better for a few slots/month
+        initialDate:  firstDate,        // open on the month containing the first slot
+        headerToolbar: {
+          left:   'prev,next today',
+          center: 'title',
+          right:  '',
+        },
+        height:       620,
+        events:       events,
+        // Show the time on each slot pill, e.g. "6:00 PM"
+        eventTimeFormat: { hour: 'numeric', minute: '2-digit', meridiem: 'short' },
+        eventClick:   function (info) { openModal(info.event) },
+      })
+      calendar.render()
+    }
+
+    // ─────────────────────────────────────────
+    // STEP 2: User clicks a slot → open modal
+    // ─────────────────────────────────────────
+    function openModal(event) {
+      // Keep a direct reference to the clicked calendar event so we can
+      // remove it later without a fragile id lookup.
+      selectedSlot = { id: event.id, event: event }
+
+      const dateStr = event.start.toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric'
+      })
+      const timeStr = event.start.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit'
+      })
+
+      document.getElementById('modal-title').textContent    = event.title
+      document.getElementById('modal-subtitle').textContent = `${dateStr} at ${timeStr}`
+      document.getElementById('form-error').classList.add('hidden')
+      document.getElementById('booking-form').reset()
+
+      const modal = document.getElementById('modal')
+      modal.classList.remove('hidden')
+      modal.classList.add('flex')
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('modal')
+      modal.classList.add('hidden')
+      modal.classList.remove('flex')
+      selectedSlot = null
+    }
+
+    // ─────────────────────────────────────────
+    // STEP 3: User submits booking form
+    // ─────────────────────────────────────────
+    document.getElementById('booking-form').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      if (!selectedSlot) return
+
+      const btn = document.getElementById('submit-btn')
+      btn.textContent = 'Booking…'
+      btn.disabled    = true
+
+      const childName   = document.getElementById('b-child-name').value.trim()
+      const childAge    = parseInt(document.getElementById('b-child-age').value)
+      const parentName  = document.getElementById('b-parent-name').value.trim()
+      const parentEmail = document.getElementById('b-parent-email').value.trim()
+      const notes       = document.getElementById('b-notes').value.trim()
+
+      // 1. Mark the slot as booked so no one else can grab it
+      const { error: slotErr } = await db
+        .from('slots')
+        .update({ is_booked: true })
+        .eq('id', selectedSlot.id)
+
+      if (slotErr) {
+        showFormError('Something went wrong. Please try again.')
+        btn.textContent = 'Confirm booking'
+        btn.disabled    = false
+        return
+      }
+
+      // 2. Save the booking details
+      const { error: bookingErr } = await db
+        .from('bookings')
+        .insert({
+          slot_id:      selectedSlot.id,
+          child_name:   childName,
+          child_age:    childAge,
+          parent_name:  parentName,
+          parent_email: parentEmail,
+          notes:        notes || null,
+        })
+
+      if (bookingErr) {
+        showFormError('Slot reserved but we couldn\'t save your details. Email us at toucanexec@gmail.com.')
+        btn.textContent = 'Confirm booking'
+        btn.disabled    = false
+        return
+      }
+
+      // 3. Fire off the confirmation email.
+      //    This is "best-effort": the booking is already saved, so even if
+      //    the email fails (e.g. testing from a local file), we still show
+      //    success. Capture the slot details BEFORE removing the event.
+      const ev = selectedSlot.event
+      sendConfirmationEmail({
+        parentEmail, parentName, childName, childAge,
+        instrument: ev?.extendedProps?.instrument || '',
+        tutorName:  ev?.extendedProps?.tutorName  || '',
+        dateStr: ev ? ev.start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '',
+        timeStr: ev ? ev.start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '',
+        notes,
+      })
+
+      // 4. Remove the booked event from the calendar.
+      //    We stored the exact event object when the modal opened, so just
+      //    remove that directly (more reliable than looking it up by id).
+      if (selectedSlot.event) selectedSlot.event.remove()
+
+      closeModal()
+      const success = document.getElementById('success')
+      success.classList.remove('hidden')
+      success.classList.add('flex')
+    })
+
+    // Calls our private Netlify function, which sends the email via Resend.
+    // Not awaited above — we never want a slow/failed email to block the
+    // "You're booked!" screen, since the booking itself already succeeded.
+    async function sendConfirmationEmail(payload) {
+      try {
+        const res = await fetch('/.netlify/functions/send-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) console.warn('Confirmation email failed:', await res.text())
+      } catch (err) {
+        // Expected when testing from a local file (no server). Booking is safe.
+        console.warn('Confirmation email not sent (booking still saved):', err)
+      }
+    }
+
+    // ─────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────
+    function showFormError(msg) {
+      const el = document.getElementById('form-error')
+      el.textContent = msg
+      el.classList.remove('hidden')
+    }
+
+    // Add one hour to a "HH:MM:SS" string (slots are 1 hour long)
+    function addOneHour(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number)
+      return `${String((h + 1) % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`
+    }
+
+    // Close modal if user clicks the dark backdrop
+    document.getElementById('modal').addEventListener('click', function (e) {
+      if (e.target === this) closeModal()
+    })
+  </script>
+
+</body>
+</html>
