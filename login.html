@@ -165,7 +165,10 @@
         // row with role = 'parent'. full_name is saved in the user's metadata.
         const { data, error } = await db.auth.signUp({
           email, password,
-          options: { data: { full_name: fullName } },
+          options: {
+            data: { full_name: fullName },
+            emailRedirectTo: ACCOUNT_URL,   // where the confirmation link sends them
+          },
         })
         if (error) return fail(error.message)
 
