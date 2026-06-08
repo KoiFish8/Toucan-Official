@@ -44,12 +44,10 @@ git push -u origin branch-name
 
 ## Forms (Formspree)
 
-Both forms POST to: `https://formspree.io/f/xqeopewq`
+Formspree endpoint: `https://formspree.io/f/xqeopewq`
 
-- **Sign up form** (`#signup-form`) — fields: child_name, child_age, parent_name, email, instrument, notes. Hidden subject: "New lesson sign-up — Toucan"
-- **Volunteer form** (`#volunteer-form`) — fields: name, email, instruments (checkboxes), experience, availability, about. Hidden subject: "New volunteer application — Toucan"
-- Submissions email to the Formspree account owner. The submitter's `email` field becomes reply-to.
-- No JS submit handlers — plain HTML POST redirect to Formspree's thank-you page.
+- **Volunteer form** (`#volunteer-form`, in the "Join the Toucan family" section) — fields: name, email, instruments (checkboxes), experience, availability, about. Hidden subject: "New volunteer application — Toucan". Plain HTML POST → Formspree thank-you page. This is still how tutors are recruited.
+- **The old lesson sign-up form was removed.** That left card now routes parents into the account system instead (Create account → add child → book): buttons link to `login.html#signup` / `login.html` and `booking.html`.
 
 ## Color Palette (light/off-white theme)
 
@@ -93,7 +91,12 @@ User accounts via **Supabase Auth**. Foundation only so far — signup, login, l
 
 - **Login methods**: email/password **and** Google sign-in (`signInWithOAuth`). Both configured and working. Google's consent screen is still in **"Testing"** mode (only emails added as Test users in Google Cloud can sign in) — must be **published** before real families can use Google login. Google OAuth client redirect URI = `https://avzvaemuvnieulukkyby.supabase.co/auth/v1/callback`.
 - **`login.html`**: combined log in / sign up card (toggle). Signup passes `full_name` in user metadata. If already logged in, auto-redirects to `account.html`.
-- **`account.html`**: logged-in landing page. Checks session (redirects to `login.html` if none), reads the user's `profiles.role`, shows a role-specific placeholder panel, and has a Log out button. **Role-based routing lives here** — currently shows placeholders; later redirect tutors → `tutor.html`, parents → `student.html` (see the commented block in the page).
+- **`account.html`**: the "My account" page. Checks session (redirects to `login.html` if none), reads `profiles.role`, and shows:
+  - **Profile** (all roles): edit **Name** (saved to auth user_metadata via `auth.updateUser({ data })` — NOT profiles, so no profiles UPDATE policy is needed and role can't be self-edited), read-only email, and **change password** (`auth.updateUser({ password })`).
+  - **My children** (parents only): full CRUD on the `children` table — add/edit/delete child cards via a modal. Fields: name (required), age, gender (optional), instrument (optional, incl. "N/A"), email (optional).
+  - **Tutor panel** (tutors only): placeholder for the coming slot-management dashboard.
+- **`children` table** (Supabase): `id`, `parent_id` (→ auth.users), `name`, `age`, `gender`, `instrument`, `email`, `created_at`. RLS: parents can fully manage (SELECT/INSERT/UPDATE/DELETE) only rows where `auth.uid() = parent_id`.
+- **Editable name lives in auth `user_metadata.full_name`**, not `profiles.full_name` (which keeps its signup-time value). Display reads from metadata.
 - **`profiles` table** (Supabase): `id` (PK → auth.users), `email`, `full_name`, `role` (default `'parent'`), `created_at`. Auto-created on signup by the `handle_new_user()` trigger. RLS: users can only SELECT their own row; **no UPDATE policy** (prevents self-promotion to tutor).
 - **Making someone a tutor**: change their `profiles.role` to `tutor` in the Supabase Table Editor (dashboard uses service role, bypasses RLS). New signups are always `parent`.
 - **Auth-aware homepage header** (`index.html`): loads supabase-js and checks the session on load. Logged out → default (`Log in` / `Book a lesson` / `Sign up`). Logged in → `Log in` becomes **My account** (→ `account.html`), `Sign up` is hidden, and for **tutors** the `Book a lesson` button becomes **Dashboard** (→ `account.html`); parents keep `Book a lesson`. Nav elements are tagged with `data-nav="login|primary|signup"` for the script to find them.

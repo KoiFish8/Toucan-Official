@@ -31,6 +31,15 @@
       },
     }
   </script>
+  <style>
+    .field {
+      width: 100%; background: #fafaf7; border: 1px solid #e0e0da; border-radius: 8px;
+      padding: 9px 12px; font-size: 14px; color: #1c1d21; font-family: inherit; outline: none;
+      transition: border-color .15s, box-shadow .15s; -webkit-appearance: none; appearance: none;
+    }
+    .field:focus { border-color: #e9a93b; box-shadow: 0 0 0 3px rgba(245,196,81,.2); }
+    .lbl { display: block; font-size: 13px; font-weight: 500; color: #3a3b41; margin-bottom: 5px; }
+  </style>
 </head>
 
 <body class="bg-bg font-sans text-fg">
@@ -38,7 +47,7 @@
   <!-- ── HEADER ── -->
   <header class="sticky top-0 z-50 w-full border-b border-black/[0.08] backdrop-blur-xl"
     style="background: rgba(250,250,247,0.8)">
-    <div class="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+    <div class="mx-auto flex h-16 max-w-3xl items-center justify-between px-6">
       <a href="index.html" class="flex items-center gap-2.5 text-fg">
         <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eceae4] shadow-sm">
           <img src="images/toucan.png" alt="Toucan logo" width="175" height="200" class="h-6 w-6 object-contain" />
@@ -53,28 +62,155 @@
   </header>
 
   <!-- ── MAIN ── -->
-  <main class="mx-auto max-w-3xl px-6 py-16">
+  <main class="mx-auto max-w-3xl px-6 py-12">
 
-    <!-- Loading state -->
     <div id="loading" class="text-[14px] text-fg3">Loading your account…</div>
 
-    <!-- Account content (filled in by JS) -->
-    <div id="account" class="hidden">
-      <p class="text-[12px] font-semibold uppercase tracking-widest text-fg4">My account</p>
-      <h1 class="mt-2 text-[clamp(1.75rem,3vw,2.25rem)] font-semibold tracking-tight">
-        Hi, <span id="display-name">there</span> 👋
-      </h1>
-      <div class="mt-3 flex flex-wrap items-center gap-3 text-[14px] text-fg3">
-        <span id="email-display"></span>
-        <span id="role-badge" class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold"></span>
+    <div id="account" class="hidden space-y-8">
+      <!-- Greeting -->
+      <div>
+        <p class="text-[12px] font-semibold uppercase tracking-widest text-fg4">My account</p>
+        <h1 class="mt-2 text-[clamp(1.6rem,3vw,2.1rem)] font-semibold tracking-tight">
+          Hi, <span id="display-name">there</span> 👋
+        </h1>
+        <div class="mt-3 flex flex-wrap items-center gap-3 text-[14px] text-fg3">
+          <span id="email-display"></span>
+          <span id="role-badge" class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold"></span>
+        </div>
       </div>
 
-      <!-- Role-specific panel -->
-      <div id="dashboard-panel" class="mt-10 rounded-2xl border border-border bg-surface p-8">
-        <!-- filled in by JS based on role -->
-      </div>
+      <!-- ── Profile settings ── -->
+      <section class="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <h2 class="text-[17px] font-semibold">Profile</h2>
+
+        <!-- Name -->
+        <div class="mt-5">
+          <label class="lbl" for="name-input">Name</label>
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <input id="name-input" type="text" class="field" placeholder="Your name" />
+            <button id="save-name-btn"
+              class="flex-none rounded-lg bg-beak px-5 py-2 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+              Save
+            </button>
+          </div>
+          <p id="name-msg" class="mt-2 hidden text-[13px]"></p>
+        </div>
+
+        <!-- Email (read-only) -->
+        <div class="mt-5">
+          <label class="lbl">Email</label>
+          <input id="email-readonly" type="email" class="field cursor-not-allowed bg-surface2 text-fg3" disabled />
+        </div>
+
+        <!-- Password -->
+        <div class="mt-6 border-t border-border pt-6">
+          <h3 class="text-[14px] font-semibold">Change password</h3>
+          <div class="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label class="lbl" for="pw1">New password</label>
+              <input id="pw1" type="password" minlength="6" class="field" placeholder="At least 6 characters" />
+            </div>
+            <div>
+              <label class="lbl" for="pw2">Confirm new password</label>
+              <input id="pw2" type="password" minlength="6" class="field" placeholder="Re-enter password" />
+            </div>
+          </div>
+          <button id="save-pw-btn"
+            class="mt-3 rounded-lg border border-border2 px-5 py-2 text-[14px] font-medium text-fg transition hover:bg-surface2">
+            Update password
+          </button>
+          <p id="pw-msg" class="mt-2 hidden text-[13px]"></p>
+        </div>
+      </section>
+
+      <!-- ── Children (parents only) ── -->
+      <section id="children-section" class="hidden rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <div class="flex items-center justify-between">
+          <h2 class="text-[17px] font-semibold">My children</h2>
+          <button id="add-child-btn"
+            class="rounded-lg bg-beak px-4 py-2 text-[13px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+            + Add child
+          </button>
+        </div>
+        <p class="mt-1 text-[13px] text-fg3">The kids you're booking lessons for.</p>
+
+        <div id="children-list" class="mt-5 space-y-3"></div>
+        <p id="children-empty" class="mt-5 hidden rounded-xl border border-dashed border-border2 p-6 text-center text-[14px] text-fg3">
+          No children added yet. Click <span class="font-medium text-fg2">“Add child”</span> to get started.
+        </p>
+      </section>
+
+      <!-- ── Tutor panel (tutors only) ── -->
+      <section id="tutor-section" class="hidden rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <h2 class="text-[17px] font-semibold">Tutor dashboard</h2>
+        <p class="mt-2 text-[14px] leading-relaxed text-fg3">
+          Coming soon: add and remove your lesson slots, and see who's booked them.
+        </p>
+        <span class="mt-4 inline-block rounded-lg bg-surface2 px-3 py-1.5 text-[13px] text-fg3">🛠️ Under construction</span>
+      </section>
     </div>
   </main>
+
+  <!-- ── CHILD ADD/EDIT MODAL ── -->
+  <div id="child-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-2xl bg-surface p-7 shadow-2xl">
+      <h3 id="child-modal-title" class="text-[18px] font-semibold">Add a child</h3>
+
+      <form id="child-form" class="mt-5 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="lbl" for="c-name">Name <span class="text-beak">*</span></label>
+            <input id="c-name" type="text" required class="field" placeholder="First and last" />
+          </div>
+          <div>
+            <label class="lbl" for="c-age">Age</label>
+            <input id="c-age" type="number" min="1" max="100" class="field" placeholder="e.g. 8" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="lbl" for="c-gender">Gender <span class="text-fg4">(optional)</span></label>
+            <select id="c-gender" class="field">
+              <option value="">Prefer not to say</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" for="c-instrument">Instrument</label>
+            <select id="c-instrument" class="field">
+              <option value="">Not sure yet</option>
+              <option>Piano</option>
+              <option>Violin</option>
+              <option>Viola</option>
+              <option>Cello</option>
+              <option value="N/A">N/A</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="lbl" for="c-email">Child's email <span class="text-fg4">(optional)</span></label>
+          <input id="c-email" type="email" class="field" placeholder="optional@example.com" />
+        </div>
+
+        <p id="child-msg" class="hidden text-[13px] text-red-500"></p>
+
+        <div class="flex gap-3 pt-1">
+          <button type="button" id="child-cancel"
+            class="flex-1 rounded-lg border border-border2 py-2.5 text-[14px] font-medium text-fg3 transition hover:bg-surface2">
+            Cancel
+          </button>
+          <button type="submit" id="child-save"
+            class="flex-1 rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     // ── Supabase setup ──
@@ -83,81 +219,190 @@
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
 
     const LOGIN_URL = new URL('login.html', window.location.href).href
+    let currentUser = null
+    let editingChildId = null   // null = adding, otherwise = editing this child
 
-    // ── On load: make sure someone is logged in, then load their profile ──
     init()
 
     async function init() {
-      // getSession also picks up the session from the URL after a Google redirect
       const { data: { session } } = await db.auth.getSession()
+      if (!session) { window.location.replace(LOGIN_URL); return }
+      currentUser = session.user
 
-      if (!session) {
-        // Not logged in → bounce to the login page
-        window.location.replace(LOGIN_URL)
-        return
-      }
-
-      const user = session.user
-
-      // Look up this user's profile row to get their role.
-      // (The profile is auto-created by a database trigger at signup.)
-      const { data: profile } = await db
-        .from('profiles')
-        .select('full_name, role')
-        .eq('id', user.id)
-        .single()
-
+      // Role comes from profiles; editable name lives in the user's auth metadata
+      const { data: profile } = await db.from('profiles').select('role').eq('id', currentUser.id).single()
       const role = profile?.role || 'parent'
-      const name = profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0]
+      const name = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0]
 
-      // Fill in the header info
       document.getElementById('display-name').textContent = name
-      document.getElementById('email-display').textContent = user.email
+      document.getElementById('email-display').textContent = currentUser.email
+      document.getElementById('email-readonly').value = currentUser.email
+      document.getElementById('name-input').value = currentUser.user_metadata?.full_name || ''
 
       const badge = document.getElementById('role-badge')
       badge.textContent = role === 'tutor' ? 'Tutor' : 'Parent / Student'
-      badge.classList.add(
-        role === 'tutor' ? 'bg-face/15' : 'bg-leaf/15',
-        role === 'tutor' ? 'text-face' : 'text-leaf',
-      )
+      badge.classList.add(role === 'tutor' ? 'bg-face/15' : 'bg-leaf/15', role === 'tutor' ? 'text-face' : 'text-leaf')
 
-      // ─────────────────────────────────────────────────────────
-      // ROLE-BASED ROUTING.
-      // For now we just show a placeholder panel per role. Once the
-      // dashboards are built, replace these panels with a redirect, e.g.:
-      //   if (role === 'tutor')  window.location.replace('tutor.html')
-      //   else                   window.location.replace('student.html')
-      // ─────────────────────────────────────────────────────────
-      const panel = document.getElementById('dashboard-panel')
+      // Show the right section for the role
       if (role === 'tutor') {
-        panel.innerHTML = `
-          <h2 class="text-[18px] font-semibold">Tutor dashboard</h2>
-          <p class="mt-2 text-[14px] leading-relaxed text-fg3">
-            Coming soon: add and remove your lesson slots, and see who's booked them.
-          </p>
-          <span class="mt-4 inline-block rounded-lg bg-surface2 px-3 py-1.5 text-[13px] text-fg3">🛠️ Under construction</span>`
+        document.getElementById('tutor-section').classList.remove('hidden')
       } else {
-        panel.innerHTML = `
-          <h2 class="text-[18px] font-semibold">Your lessons</h2>
-          <p class="mt-2 text-[14px] leading-relaxed text-fg3">
-            Coming soon: book new lessons and see the ones you've already booked, all in one place.
-          </p>
-          <a href="booking.html"
-            class="mt-4 inline-block rounded-lg bg-beak px-5 py-2.5 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
-            Book a lesson
-          </a>`
+        document.getElementById('children-section').classList.remove('hidden')
+        loadChildren()
       }
 
-      // Show the content, hide the loading line
       document.getElementById('loading').classList.add('hidden')
       document.getElementById('account').classList.remove('hidden')
     }
 
-    // ── Log out ──
+    // ─────────────── Profile: name ───────────────
+    document.getElementById('save-name-btn').addEventListener('click', async () => {
+      const name = document.getElementById('name-input').value.trim()
+      const btn = document.getElementById('save-name-btn')
+      btn.disabled = true; btn.textContent = 'Saving…'
+      const { error } = await db.auth.updateUser({ data: { full_name: name } })
+      btn.disabled = false; btn.textContent = 'Save'
+      if (error) return showMsg('name-msg', error.message, false)
+      document.getElementById('display-name').textContent = name || currentUser.email.split('@')[0]
+      showMsg('name-msg', 'Name updated ✓', true)
+    })
+
+    // ─────────────── Profile: password ───────────────
+    document.getElementById('save-pw-btn').addEventListener('click', async () => {
+      const p1 = document.getElementById('pw1').value
+      const p2 = document.getElementById('pw2').value
+      if (p1.length < 6) return showMsg('pw-msg', 'Password must be at least 6 characters.', false)
+      if (p1 !== p2)     return showMsg('pw-msg', "Passwords don't match.", false)
+      const btn = document.getElementById('save-pw-btn')
+      btn.disabled = true; btn.textContent = 'Updating…'
+      const { error } = await db.auth.updateUser({ password: p1 })
+      btn.disabled = false; btn.textContent = 'Update password'
+      if (error) return showMsg('pw-msg', error.message, false)
+      document.getElementById('pw1').value = ''
+      document.getElementById('pw2').value = ''
+      showMsg('pw-msg', 'Password updated ✓', true)
+    })
+
+    // ─────────────── Children: load + render ───────────────
+    async function loadChildren() {
+      const { data: kids, error } = await db
+        .from('children')
+        .select('id, name, age, gender, instrument, email')
+        .order('created_at', { ascending: true })
+
+      const list = document.getElementById('children-list')
+      const empty = document.getElementById('children-empty')
+      list.innerHTML = ''
+
+      if (error) { list.innerHTML = `<p class="text-[14px] text-red-500">Couldn't load children: ${error.message}</p>`; return }
+      if (!kids.length) { empty.classList.remove('hidden'); return }
+      empty.classList.add('hidden')
+
+      kids.forEach(k => {
+        const bits = [
+          k.age ? `Age ${k.age}` : null,
+          k.instrument || null,
+          k.gender || null,
+        ].filter(Boolean).join(' · ')
+        const card = document.createElement('div')
+        card.className = 'flex items-center justify-between gap-3 rounded-xl border border-border bg-bg p-4'
+        card.innerHTML = `
+          <div class="min-w-0">
+            <div class="text-[15px] font-semibold text-fg">${esc(k.name)}</div>
+            <div class="text-[13px] text-fg3">${esc(bits) || '—'}</div>
+            ${k.email ? `<div class="text-[12px] text-fg4">${esc(k.email)}</div>` : ''}
+          </div>
+          <div class="flex flex-none gap-2">
+            <button data-edit="${k.id}" class="rounded-md border border-border2 px-3 py-1.5 text-[13px] font-medium text-fg2 transition hover:bg-surface2">Edit</button>
+            <button data-del="${k.id}" class="rounded-md border border-border2 px-3 py-1.5 text-[13px] font-medium text-red-500 transition hover:bg-red-50">Delete</button>
+          </div>`
+        list.appendChild(card)
+      })
+
+      // Wire up edit/delete buttons
+      list.querySelectorAll('[data-edit]').forEach(b =>
+        b.addEventListener('click', () => openChildModal(kids.find(k => k.id === b.dataset.edit))))
+      list.querySelectorAll('[data-del]').forEach(b =>
+        b.addEventListener('click', () => deleteChild(b.dataset.del, kids.find(k => k.id === b.dataset.del)?.name)))
+    }
+
+    // ─────────────── Children: add / edit modal ───────────────
+    const childModal = document.getElementById('child-modal')
+
+    document.getElementById('add-child-btn').addEventListener('click', () => openChildModal(null))
+    document.getElementById('child-cancel').addEventListener('click', closeChildModal)
+    childModal.addEventListener('click', e => { if (e.target === childModal) closeChildModal() })
+
+    function openChildModal(child) {
+      editingChildId = child ? child.id : null
+      document.getElementById('child-modal-title').textContent = child ? 'Edit child' : 'Add a child'
+      document.getElementById('c-name').value = child?.name || ''
+      document.getElementById('c-age').value = child?.age ?? ''
+      document.getElementById('c-gender').value = child?.gender || ''
+      document.getElementById('c-instrument').value = child?.instrument || ''
+      document.getElementById('c-email').value = child?.email || ''
+      document.getElementById('child-msg').classList.add('hidden')
+      childModal.classList.remove('hidden'); childModal.classList.add('flex')
+    }
+    function closeChildModal() {
+      childModal.classList.add('hidden'); childModal.classList.remove('flex')
+      editingChildId = null
+    }
+
+    document.getElementById('child-form').addEventListener('submit', async e => {
+      e.preventDefault()
+      const row = {
+        parent_id:  currentUser.id,
+        name:       document.getElementById('c-name').value.trim(),
+        age:        document.getElementById('c-age').value ? parseInt(document.getElementById('c-age').value) : null,
+        gender:     document.getElementById('c-gender').value || null,
+        instrument: document.getElementById('c-instrument').value || null,
+        email:      document.getElementById('c-email').value.trim() || null,
+      }
+      const btn = document.getElementById('child-save')
+      btn.disabled = true; btn.textContent = 'Saving…'
+
+      let error
+      if (editingChildId) {
+        ({ error } = await db.from('children').update(row).eq('id', editingChildId))
+      } else {
+        ({ error } = await db.from('children').insert(row))
+      }
+      btn.disabled = false; btn.textContent = 'Save'
+
+      if (error) {
+        const m = document.getElementById('child-msg')
+        m.textContent = error.message; m.classList.remove('hidden')
+        return
+      }
+      closeChildModal()
+      loadChildren()
+    })
+
+    async function deleteChild(id, name) {
+      if (!confirm(`Remove ${name || 'this child'}? This can't be undone.`)) return
+      const { error } = await db.from('children').delete().eq('id', id)
+      if (error) { alert("Couldn't delete: " + error.message); return }
+      loadChildren()
+    }
+
+    // ─────────────── Log out ───────────────
     document.getElementById('logout-btn').addEventListener('click', async () => {
       await db.auth.signOut()
       window.location.replace(LOGIN_URL)
     })
+
+    // ── Helpers ──
+    function showMsg(id, text, ok) {
+      const el = document.getElementById(id)
+      el.textContent = text
+      el.className = 'mt-2 text-[13px] ' + (ok ? 'text-leaf' : 'text-red-500')
+    }
+    function esc(s) {
+      return (s == null ? '' : String(s))
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+    }
   </script>
 
 </body>

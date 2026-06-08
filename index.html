@@ -310,57 +310,42 @@
 
       <div class="mt-12 grid gap-6 lg:grid-cols-2">
 
-        <!-- ── SIGN UP FORM ── -->
-        <div id="signup-card" class="glow-box rounded-2xl border border-black/[0.07] bg-surface p-8">
+        <!-- ── SIGN UP FOR LESSONS (account flow) ── -->
+        <div id="signup-card" class="glow-box flex flex-col rounded-2xl border border-black/[0.07] bg-surface p-8">
           <h3 class="text-[18px] font-semibold text-fg">Sign up for free lessons</h3>
           <p class="mt-2 text-[14px] leading-relaxed text-fg3">
-            Know a child who'd love to learn an instrument? Fill out the form
-            and we'll match them with a tutor at no cost.
+            Create a free Toucan account, add your child's details, and book lessons
+            that fit your schedule — all at no cost.
           </p>
 
-          <form id="signup-form" class="mt-6 space-y-4" action="https://formspree.io/f/xqeopewq" method="POST">
-            <input type="hidden" name="_subject" value="New lesson sign-up — Toucan" />
-            <div class="form-row">
-              <div>
-                <label for="s-child-name">Child's name <span class="text-beak">*</span></label>
-                <input id="s-child-name" name="child_name" type="text" class="field" placeholder="First and last"
-                  required />
-              </div>
-              <div>
-                <label for="s-child-age">Child's age <span class="text-beak">*</span></label>
-                <input id="s-child-age" name="child_age" type="number" min="3" max="18" class="field"
-                  placeholder="e.g. 8" required />
-              </div>
-            </div>
-            <div>
-              <label for="s-parent-name">Parent / guardian name <span class="text-beak">*</span></label>
-              <input id="s-parent-name" name="parent_name" type="text" class="field" placeholder="Your name" required />
-            </div>
-            <div>
-              <label for="s-email">Your email <span class="text-beak">*</span></label>
-              <input id="s-email" name="email" type="email" class="field" placeholder="you@example.com" required />
-            </div>
-            <div>
-              <label for="s-instrument">Instrument interested in <span class="text-beak">*</span></label>
-              <select id="s-instrument" name="instrument" class="field" required>
-                <option value="" disabled selected>Choose an instrument…</option>
-                <option>Piano</option>
-                <option>Violin</option>
-                <option>Viola</option>
-                <option>Cello</option>
-                <option>Not sure yet</option>
-              </select>
-            </div>
-            <div>
-              <label for="s-notes">Anything else we should know? <span class="text-fg4">(optional)</span></label>
-              <textarea id="s-notes" name="notes" class="field"
-                placeholder="Scheduling preferences, prior experience, etc."></textarea>
-            </div>
-            <button type="submit"
-              class="glow-btn w-full rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">
-              Sign up for free lessons
-            </button>
-          </form>
+          <ol class="mt-6 space-y-4">
+            <li class="flex items-center gap-3">
+              <span class="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-beak/15 text-[13px] font-bold text-beakdeep">1</span>
+              <span class="text-[14px] text-fg2">Create your free account</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-beak/15 text-[13px] font-bold text-beakdeep">2</span>
+              <span class="text-[14px] text-fg2">Add your child's details</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-beak/15 text-[13px] font-bold text-beakdeep">3</span>
+              <span class="text-[14px] text-fg2">Pick a time and book a lesson</span>
+            </li>
+          </ol>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="login.html#signup"
+              class="glow-btn inline-flex flex-1 items-center justify-center rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">
+              Create an account
+            </a>
+            <a href="login.html"
+              class="inline-flex flex-1 items-center justify-center rounded-lg border border-border2 py-2.5 text-[14px] font-medium text-fg transition-colors hover:bg-surface2">
+              Log in
+            </a>
+          </div>
+          <p class="mt-4 text-[13px] text-fg3">
+            Prefer to just look first? <a href="booking.html" class="font-medium text-face hover:underline">Browse open lesson times →</a>
+          </p>
         </div>
 
         <!-- ── VOLUNTEER FORM ── -->

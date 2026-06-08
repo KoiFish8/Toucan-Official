@@ -136,6 +136,11 @@
       message:    document.getElementById('message'),
     }
 
+    // Open straight into sign-up mode when linked as login.html#signup
+    if (location.hash === '#signup') {
+      setTimeout(() => document.getElementById('toggle-btn').click(), 0)
+    }
+
     document.getElementById('toggle-btn').addEventListener('click', () => {
       mode = (mode === 'login') ? 'signup' : 'login'
       const signup = mode === 'signup'
