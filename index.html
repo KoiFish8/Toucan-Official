@@ -42,13 +42,13 @@
       <div class="flex items-center gap-2">
         <a href="#contact"
           class="hidden rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg sm:block">Contact</a>
-        <a href="login.html"
+        <a href="login.html" data-nav="login"
           class="hidden rounded-md px-3 py-1.5 text-[13px] font-medium text-fg3 transition-colors hover:text-fg sm:block">Log in</a>
         <!-- TEMP booking link — replace with a sign-in-gated booking flow later -->
-        <a href="booking.html"
+        <a href="booking.html" data-nav="primary"
           class="hidden rounded-full border border-border2 px-4 py-1.5 text-[13px] font-semibold text-fg transition-colors hover:bg-surface2 sm:inline-flex">Book
           a lesson</a>
-        <a href="#involved"
+        <a href="#involved" data-nav="signup"
           class="glow-btn rounded-full bg-beak px-4 py-1.5 text-[13px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">Sign
           up</a>
         <!-- hamburger (mobile only) -->
@@ -78,13 +78,13 @@
         class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">Volunteer</a>
       <a href="#contact"
         class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">Contact</a>
-      <a href="login.html"
+      <a href="login.html" data-nav="login"
         class="block rounded-md px-3 py-2.5 text-[15px] font-medium text-fg2 transition-colors hover:bg-black/[0.04] hover:text-fg">Log in</a>
       <!-- TEMP booking link — replace with a sign-in-gated booking flow later -->
-      <a href="booking.html"
+      <a href="booking.html" data-nav="primary"
         class="mt-2 block rounded-lg border border-border2 px-3 py-2.5 text-center text-[15px] font-semibold text-fg transition-colors hover:bg-surface2">Book
         a lesson</a>
-      <a href="#involved"
+      <a href="#involved" data-nav="signup"
         class="mt-2 block rounded-lg bg-beak px-3 py-2.5 text-center text-[15px] font-semibold text-[#08090a] transition-colors hover:bg-beakdeep">Sign
         up for lessons</a>
     </nav>
@@ -513,6 +513,43 @@
         { threshold: 0.3, rootMargin: '0px 0px -200px 0px' }
       );
       els.forEach((el) => io.observe(el));
+    })();
+  </script>
+
+  <!-- ── Auth-aware header: swap nav links when the visitor is logged in ── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (async function () {
+      const SUPABASE_URL  = 'https://avzvaemuvnieulukkyby.supabase.co'
+      const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2enZhZW11dm5pZXVsdWtreWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4Njk1NDQsImV4cCI6MjA5NjQ0NTU0NH0.1K6omaUjfY5dqlUhwA9LSj53ewfiFknQN71dj5Kt3rU'
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+
+      // Are they logged in? (reads the saved session from the browser)
+      const { data: { session } } = await db.auth.getSession()
+      if (!session) return  // logged out → leave the default header as-is
+
+      // Find their role (defaults to parent)
+      let role = 'parent'
+      try {
+        const { data: profile } = await db
+          .from('profiles').select('role').eq('id', session.user.id).single()
+        if (profile && profile.role) role = profile.role
+      } catch (e) { /* ignore — fall back to parent */ }
+
+      // "Log in" → "My account" (direct link to their dashboard)
+      document.querySelectorAll('[data-nav="login"]').forEach(a => {
+        a.textContent = 'My account'
+        a.setAttribute('href', 'account.html')
+      })
+      // Hide "Sign up" — they already have an account
+      document.querySelectorAll('[data-nav="signup"]').forEach(el => el.classList.add('hidden'))
+      // Tutors don't book lessons → turn "Book a lesson" into "Dashboard"
+      if (role === 'tutor') {
+        document.querySelectorAll('[data-nav="primary"]').forEach(a => {
+          a.textContent = 'Dashboard'
+          a.setAttribute('href', 'account.html')
+        })
+      }
     })();
   </script>
 </body>

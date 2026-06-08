@@ -91,12 +91,13 @@ email is sent.
 
 User accounts via **Supabase Auth**. Foundation only so far — signup, login, logout, roles, role-based routing. Dashboards not built yet.
 
-- **Login methods**: email/password **and** Google sign-in (`signInWithOAuth`). Email/password works immediately; Google needs the provider configured in Supabase + the deployed site.
+- **Login methods**: email/password **and** Google sign-in (`signInWithOAuth`). Both configured and working. Google's consent screen is still in **"Testing"** mode (only emails added as Test users in Google Cloud can sign in) — must be **published** before real families can use Google login. Google OAuth client redirect URI = `https://avzvaemuvnieulukkyby.supabase.co/auth/v1/callback`.
 - **`login.html`**: combined log in / sign up card (toggle). Signup passes `full_name` in user metadata. If already logged in, auto-redirects to `account.html`.
 - **`account.html`**: logged-in landing page. Checks session (redirects to `login.html` if none), reads the user's `profiles.role`, shows a role-specific placeholder panel, and has a Log out button. **Role-based routing lives here** — currently shows placeholders; later redirect tutors → `tutor.html`, parents → `student.html` (see the commented block in the page).
 - **`profiles` table** (Supabase): `id` (PK → auth.users), `email`, `full_name`, `role` (default `'parent'`), `created_at`. Auto-created on signup by the `handle_new_user()` trigger. RLS: users can only SELECT their own row; **no UPDATE policy** (prevents self-promotion to tutor).
 - **Making someone a tutor**: change their `profiles.role` to `tutor` in the Supabase Table Editor (dashboard uses service role, bypasses RLS). New signups are always `parent`.
-- **Supabase auth settings**: email confirmation is OFF (immediate login during dev); Site URL + `/account` redirect URLs allow-listed for the Google OAuth return.
+- **Auth-aware homepage header** (`index.html`): loads supabase-js and checks the session on load. Logged out → default (`Log in` / `Book a lesson` / `Sign up`). Logged in → `Log in` becomes **My account** (→ `account.html`), `Sign up` is hidden, and for **tutors** the `Book a lesson` button becomes **Dashboard** (→ `account.html`); parents keep `Book a lesson`. Nav elements are tagged with `data-nav="login|primary|signup"` for the script to find them.
+- **Supabase auth settings**: email confirmation is **ON** (signups get a confirm email; `login.html` passes `emailRedirectTo: account.html`). **Site URL = `https://toucanmusic.netlify.app`** and redirect allow-list includes `https://toucanmusic.netlify.app/**` — required so confirmation links and Google sign-in return to the live site (the default `localhost:3000` Site URL breaks the links).
 
 ### Planned next (not built yet)
 - Two logged-in dashboards: **student/parent** (book lessons, see their bookings) and **tutor** (manage their own slots + see bookings).
