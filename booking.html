@@ -322,7 +322,7 @@
         backgroundColor: '#f5c451',
         borderColor:     '#e9a93b',
         textColor:       '#08090a',
-        extendedProps:   { tutorName: tutor.name, instrument, date: slot.date, startTime: slot.start_time },
+        extendedProps:   { tutorName: tutor.name, tutorId: tutor.id, instrument, date: slot.date, startTime: slot.start_time },
       }))
 
       // 4. Find the first slot's date so the calendar opens there
@@ -466,6 +466,7 @@
         parentEmail, parentName, childName, childAge,
         instrument: ev?.extendedProps?.instrument || '',
         tutorName:  ev?.extendedProps?.tutorName  || '',
+        tutorId:    ev?.extendedProps?.tutorId    || null,
         dateStr: ev ? ev.start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '',
         timeStr: ev ? ev.start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '',
         notes,

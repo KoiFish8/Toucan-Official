@@ -319,12 +319,15 @@
       document.getElementById('email-readonly').value = currentUser.email
       document.getElementById('name-input').value = currentUser.user_metadata?.full_name || ''
 
+      // 'founder' = tutor + a bit more (gets all booking emails); treat like a tutor here
+      const isTutor = role === 'tutor' || role === 'founder'
+
       const badge = document.getElementById('role-badge')
-      badge.textContent = role === 'tutor' ? 'Tutor' : 'Parent / Student'
-      badge.classList.add(role === 'tutor' ? 'bg-face/15' : 'bg-leaf/15', role === 'tutor' ? 'text-face' : 'text-leaf')
+      badge.textContent = role === 'founder' ? 'Founder' : (role === 'tutor' ? 'Tutor' : 'Parent / Student')
+      badge.classList.add(isTutor ? 'bg-face/15' : 'bg-leaf/15', isTutor ? 'text-face' : 'text-leaf')
 
       // Show the right section for the role
-      if (role === 'tutor') {
+      if (isTutor) {
         document.getElementById('page-label').textContent = 'Dashboard'
         document.getElementById('tutor-section').classList.remove('hidden')
         initTutor()
