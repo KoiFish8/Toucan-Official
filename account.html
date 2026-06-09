@@ -140,13 +140,30 @@
         </p>
       </section>
 
-      <!-- ── Tutor panel (tutors only) ── -->
+      <!-- ── Tutor dashboard (tutors only) ── -->
       <section id="tutor-section" class="hidden rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <h2 class="text-[17px] font-semibold">Tutor dashboard</h2>
-        <p class="mt-2 text-[14px] leading-relaxed text-fg3">
-          Coming soon: add and remove your lesson slots, and see who's booked them.
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-[17px] font-semibold">My lesson slots</h2>
+            <p id="tutor-instrument" class="mt-1 text-[13px] text-fg3"></p>
+          </div>
+          <button id="add-slot-btn"
+            class="flex-none rounded-lg bg-beak px-4 py-2 text-[13px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+            + Add slot
+          </button>
+        </div>
+
+        <!-- shown if this account's email isn't linked to a tutor row -->
+        <div id="tutor-unlinked" class="mt-5 hidden rounded-xl border border-dashed border-border2 p-6 text-[14px] text-fg3">
+          Your account isn't linked to a tutor profile yet. Make sure the email on your
+          <span class="font-medium text-fg2">tutors</span> record matches <span id="tutor-unlinked-email" class="font-medium text-fg2"></span>,
+          or ask the team to set it up.
+        </div>
+
+        <div id="slots-list" class="mt-5 space-y-3"></div>
+        <p id="slots-empty" class="mt-5 hidden rounded-xl border border-dashed border-border2 p-6 text-center text-[14px] text-fg3">
+          No slots yet. Click <span class="font-medium text-fg2">“Add slot”</span> to open a lesson time for booking.
         </p>
-        <span class="mt-4 inline-block rounded-lg bg-surface2 px-3 py-1.5 text-[13px] text-fg3">🛠️ Under construction</span>
       </section>
     </div>
   </main>
@@ -212,6 +229,35 @@
     </div>
   </div>
 
+  <!-- ── ADD SLOT MODAL (tutors) ── -->
+  <div id="slot-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-2xl bg-surface p-7 shadow-2xl">
+      <h3 class="text-[18px] font-semibold">Add a lesson slot</h3>
+      <p class="mt-1 text-[13px] text-fg3">Open a 1-hour time for a student to book.</p>
+      <form id="slot-form" class="mt-5 space-y-4">
+        <div>
+          <label class="lbl" for="slot-date">Date <span class="text-beak">*</span></label>
+          <input id="slot-date" type="date" required class="field" />
+        </div>
+        <div>
+          <label class="lbl" for="slot-time">Start time <span class="text-beak">*</span></label>
+          <input id="slot-time" type="time" required class="field" />
+        </div>
+        <p id="slot-msg" class="hidden text-[13px] text-red-500"></p>
+        <div class="flex gap-3 pt-1">
+          <button type="button" id="slot-cancel"
+            class="flex-1 rounded-lg border border-border2 py-2.5 text-[14px] font-medium text-fg3 transition hover:bg-surface2">
+            Cancel
+          </button>
+          <button type="submit" id="slot-save"
+            class="flex-1 rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+            Add slot
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // ── Supabase setup ──
     const SUPABASE_URL  = 'https://avzvaemuvnieulukkyby.supabase.co'
@@ -246,6 +292,7 @@
       // Show the right section for the role
       if (role === 'tutor') {
         document.getElementById('tutor-section').classList.remove('hidden')
+        initTutor()
       } else {
         document.getElementById('children-section').classList.remove('hidden')
         loadChildren()
@@ -384,6 +431,124 @@
       const { error } = await db.from('children').delete().eq('id', id)
       if (error) { alert("Couldn't delete: " + error.message); return }
       loadChildren()
+    }
+
+    // ═══════════════ TUTOR DASHBOARD ═══════════════
+    let tutorRow = null
+
+    // Link this account to its tutor profile by matching email
+    async function initTutor() {
+      const { data: rows } = await db
+        .from('tutors').select('id, name, instrument').eq('email', currentUser.email).limit(1)
+
+      if (!rows || !rows.length) {
+        document.getElementById('tutor-unlinked-email').textContent = currentUser.email
+        document.getElementById('tutor-unlinked').classList.remove('hidden')
+        const add = document.getElementById('add-slot-btn')
+        add.disabled = true; add.classList.add('opacity-50', 'cursor-not-allowed')
+        return
+      }
+      tutorRow = rows[0]
+      document.getElementById('tutor-instrument').textContent = `${tutorRow.name} · teaches ${tutorRow.instrument}`
+      loadSlots()
+    }
+
+    async function loadSlots() {
+      const { data: slots, error } = await db
+        .from('slots').select('id, date, start_time, is_booked')
+        .eq('tutor_id', tutorRow.id)
+        .order('date', { ascending: true }).order('start_time', { ascending: true })
+
+      const list = document.getElementById('slots-list')
+      const empty = document.getElementById('slots-empty')
+      list.innerHTML = ''
+      if (error) { list.innerHTML = `<p class="text-[14px] text-red-500">Couldn't load slots: ${esc(error.message)}</p>`; return }
+      if (!slots.length) { empty.classList.remove('hidden'); return }
+      empty.classList.add('hidden')
+
+      // Pull booking details for any booked slots
+      const bookedIds = slots.filter(s => s.is_booked).map(s => s.id)
+      const bySlot = {}
+      if (bookedIds.length) {
+        const { data: bks } = await db
+          .from('bookings').select('slot_id, child_name, child_age, parent_name, parent_email, notes')
+          .in('slot_id', bookedIds)
+        ;(bks || []).forEach(b => { bySlot[b.slot_id] = b })
+      }
+
+      slots.forEach(s => {
+        const f = fmtSlot(s.date, s.start_time)
+        const card = document.createElement('div')
+        card.className = 'rounded-xl border border-border bg-bg p-4'
+        if (s.is_booked) {
+          const b = bySlot[s.id]
+          card.innerHTML = `
+            <div class="text-[15px] font-semibold text-fg">${f.day} · ${f.time}</div>
+            <div class="mt-0.5 text-[12px] font-semibold text-leaf">● Booked</div>
+            ${b ? `<div class="mt-3 rounded-lg bg-surface2 p-3 text-[13px] text-fg2">
+              <div><span class="text-fg3">Student:</span> ${esc(b.child_name)}${b.child_age ? ` (age ${esc(String(b.child_age))})` : ''}</div>
+              <div><span class="text-fg3">Parent:</span> ${esc(b.parent_name)} · <a href="mailto:${esc(b.parent_email)}" class="text-face hover:underline">${esc(b.parent_email)}</a></div>
+              ${b.notes ? `<div class="mt-1 text-fg3">“${esc(b.notes)}”</div>` : ''}
+            </div>` : ''}`
+        } else {
+          card.innerHTML = `
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-[15px] font-semibold text-fg">${f.day} · ${f.time}</div>
+                <div class="mt-0.5 text-[12px] font-semibold text-fg4">○ Open</div>
+              </div>
+              <button data-del-slot="${s.id}"
+                class="flex-none rounded-md border border-border2 px-3 py-1.5 text-[13px] font-medium text-red-500 transition hover:bg-red-50">Remove</button>
+            </div>`
+        }
+        list.appendChild(card)
+      })
+
+      list.querySelectorAll('[data-del-slot]').forEach(btn =>
+        btn.addEventListener('click', () => removeSlot(btn.dataset.delSlot)))
+    }
+
+    async function removeSlot(id) {
+      if (!confirm('Remove this open slot? Students will no longer see it.')) return
+      const { error } = await db.from('slots').delete().eq('id', id)
+      if (error) { alert("Couldn't remove the slot: " + error.message); return }
+      loadSlots()
+    }
+
+    // Add-slot modal
+    const slotModal = document.getElementById('slot-modal')
+    document.getElementById('add-slot-btn').addEventListener('click', () => {
+      if (!tutorRow) return
+      document.getElementById('slot-form').reset()
+      document.getElementById('slot-msg').classList.add('hidden')
+      slotModal.classList.remove('hidden'); slotModal.classList.add('flex')
+    })
+    document.getElementById('slot-cancel').addEventListener('click', closeSlotModal)
+    slotModal.addEventListener('click', e => { if (e.target === slotModal) closeSlotModal() })
+    function closeSlotModal() { slotModal.classList.add('hidden'); slotModal.classList.remove('flex') }
+
+    document.getElementById('slot-form').addEventListener('submit', async e => {
+      e.preventDefault()
+      const date = document.getElementById('slot-date').value
+      const time = document.getElementById('slot-time').value   // "HH:MM"
+      const btn = document.getElementById('slot-save')
+      btn.disabled = true; btn.textContent = 'Adding…'
+      const { error } = await db.from('slots').insert({
+        tutor_id: tutorRow.id, date, start_time: time + ':00', is_booked: false,
+      })
+      btn.disabled = false; btn.textContent = 'Add slot'
+      if (error) {
+        const m = document.getElementById('slot-msg'); m.textContent = error.message; m.classList.remove('hidden'); return
+      }
+      closeSlotModal(); loadSlots()
+    })
+
+    function fmtSlot(date, time) {
+      const d = new Date(date + 'T' + time)
+      return {
+        day:  d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        time: d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      }
     }
 
     // ─────────────── Log out ───────────────

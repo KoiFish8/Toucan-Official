@@ -78,7 +78,8 @@ email is sent.
 - **Database**: Supabase
   - URL: `https://avzvaemuvnieulukkyby.supabase.co` (anon key is in `booking.html` — safe to be public; it's the anon key, protected by RLS).
   - Tables: `tutors` (id, name, instrument, email), `slots` (id, tutor_id, date, start_time, is_booked), `bookings` (id, slot_id, child_name, child_age, parent_name, parent_email, notes).
-  - **RLS policies** (all for `anon` role): `slots` SELECT where `is_booked=false`; `slots` UPDATE (true/true); `bookings` INSERT (true). All verified working.
+  - **RLS policies** — anonymous booking (`anon` role): `slots` SELECT where `is_booked=false`; `slots` UPDATE (true/true); `bookings` INSERT (true). Tutor dashboard (`authenticated` role, matched by `auth.jwt()->>'email'` = `tutors.email`): `slots` SELECT/INSERT/DELETE for own `tutor_id`; `bookings` SELECT for bookings on own slots.
+  - **Known gap (fix when building parent dashboard):** the unbooked-`slots` SELECT and `bookings` INSERT policies are `anon`-only, so a **logged-in** visitor on `booking.html` currently sees no slots / can't book. Anonymous booking still works. Add `authenticated` versions of those policies when wiring booking into the parent dashboard.
 - **Booking flow** (client-side JS in `booking.html`): mark slot `is_booked=true` → insert booking row → call email function → remove event from calendar → show success. Slot event is removed via a stored direct reference (not `getEventById`).
 - **Confirmation email**: Netlify serverless function `netlify/functions/send-confirmation.mjs` calls the Resend API. The secret key is NEVER in the browser — it's a Netlify env var.
   - **Email only runs on the deployed site**, not local `file://` (it's best-effort; booking still works locally without it).
@@ -94,7 +95,7 @@ User accounts via **Supabase Auth**. Foundation only so far — signup, login, l
 - **`account.html`**: the "My account" page. Checks session (redirects to `login.html` if none), reads `profiles.role`, and shows:
   - **Profile** (all roles): edit **Name** (saved to auth user_metadata via `auth.updateUser({ data })` — NOT profiles, so no profiles UPDATE policy is needed and role can't be self-edited), read-only email, and **change password** (`auth.updateUser({ password })`).
   - **My children** (parents only): full CRUD on the `children` table — add/edit/delete child cards via a modal. Fields: name (required), age, gender (optional), instrument (optional, incl. "N/A"), email (optional).
-  - **Tutor panel** (tutors only): placeholder for the coming slot-management dashboard.
+  - **Tutor dashboard** (tutors only): manage **lesson slots** — list own slots (with booked/open status + booking details for booked ones), add a slot (date + time → `slots` insert), remove an open slot. The account is linked to its `tutors` row **by matching email** (`tutors.email == auth email`); if no match, shows an "account not linked" notice. Only Sean's `tutors.email` is real so far — the other tutors need their real emails set in the `tutors` table before their dashboards work.
 - **`children` table** (Supabase): `id`, `parent_id` (→ auth.users), `name`, `age`, `gender`, `instrument`, `email`, `created_at`. RLS: parents can fully manage (SELECT/INSERT/UPDATE/DELETE) only rows where `auth.uid() = parent_id`.
 - **Editable name lives in auth `user_metadata.full_name`**, not `profiles.full_name` (which keeps its signup-time value). Display reads from metadata.
 - **`profiles` table** (Supabase): `id` (PK → auth.users), `email`, `full_name`, `role` (default `'parent'`), `created_at`. Auto-created on signup by the `handle_new_user()` trigger. RLS: users can only SELECT their own row; **no UPDATE policy** (prevents self-promotion to tutor).
