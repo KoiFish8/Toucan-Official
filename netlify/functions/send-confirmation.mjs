@@ -92,7 +92,8 @@ export default async (req) => {
 // Look up who should be notified: the booking's tutor + every founder.
 // Uses the Supabase service-role key so it can read emails server-side.
 async function collectStaffEmails(tutorId) {
-  const key = process.env.SUPABASE_SERVICE_KEY
+  // Accept either name — the Netlify env var may be SUPABASE_SERVICE_KEY or SUPABASE_SERVICE_KEY_TOUCAN
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_KEY_TOUCAN
   if (!key) return []   // not configured yet → just skip staff emails
   const headers = { apikey: key, Authorization: `Bearer ${key}` }
   const emails = new Set()
