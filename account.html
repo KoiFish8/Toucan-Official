@@ -39,6 +39,11 @@
     }
     .field:focus { border-color: #e9a93b; box-shadow: 0 0 0 3px rgba(245,196,81,.2); }
     .lbl { display: block; font-size: 13px; font-weight: 500; color: #3a3b41; margin-bottom: 5px; }
+    /* Collapsible sections */
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    .chev { transition: transform .2s ease; }
+    details[open] .chev { transform: rotate(180deg); }
   </style>
 </head>
 
@@ -69,7 +74,7 @@
     <div id="account" class="hidden space-y-8">
       <!-- Greeting -->
       <div>
-        <p class="text-[12px] font-semibold uppercase tracking-widest text-fg4">My account</p>
+        <p id="page-label" class="text-[12px] font-semibold uppercase tracking-widest text-fg4">My account</p>
         <h1 class="mt-2 text-[clamp(1.6rem,3vw,2.1rem)] font-semibold tracking-tight">
           Hi, <span id="display-name">there</span> 👋
         </h1>
@@ -79,12 +84,16 @@
         </div>
       </div>
 
-      <!-- ── Profile settings ── -->
-      <section class="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <h2 class="text-[17px] font-semibold">Profile</h2>
+      <!-- ── Profile settings (collapsed by default) ── -->
+      <details class="overflow-hidden rounded-2xl border border-border bg-surface">
+        <summary class="flex items-center justify-between gap-3 p-6 sm:p-8">
+          <h2 class="text-[17px] font-semibold">Profile &amp; password</h2>
+          <svg class="chev h-5 w-5 flex-none text-fg3" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="border-t border-border p-6 sm:p-8">
 
         <!-- Name -->
-        <div class="mt-5">
+        <div>
           <label class="lbl" for="name-input">Name</label>
           <div class="flex flex-col gap-2 sm:flex-row">
             <input id="name-input" type="text" class="field" placeholder="Your name" />
@@ -121,50 +130,72 @@
           </button>
           <p id="pw-msg" class="mt-2 hidden text-[13px]"></p>
         </div>
-      </section>
+        </div>
+      </details>
 
-      <!-- ── Children (parents only) ── -->
-      <section id="children-section" class="hidden rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <div class="flex items-center justify-between">
+      <!-- ── My lessons (parents only) — open by default ── -->
+      <details id="lessons-section" open class="hidden overflow-hidden rounded-2xl border border-border bg-surface">
+        <summary class="flex items-center justify-between gap-3 p-6 sm:p-8">
+          <h2 class="text-[17px] font-semibold">My lessons</h2>
+          <svg class="chev h-5 w-5 flex-none text-fg3" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="border-t border-border p-6 sm:p-8">
+          <div id="lessons-list" class="space-y-3"></div>
+          <p id="lessons-empty" class="hidden rounded-xl border border-dashed border-border2 p-6 text-center text-[14px] text-fg3">
+            No booked lessons yet. <a href="booking.html" class="font-medium text-face hover:underline">Book one →</a>
+          </p>
+        </div>
+      </details>
+
+      <!-- ── Children (parents only) — open by default ── -->
+      <details id="children-section" open class="hidden overflow-hidden rounded-2xl border border-border bg-surface">
+        <summary class="flex items-center justify-between gap-3 p-6 sm:p-8">
           <h2 class="text-[17px] font-semibold">My children</h2>
-          <button id="add-child-btn"
-            class="rounded-lg bg-beak px-4 py-2 text-[13px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
-            + Add child
-          </button>
-        </div>
-        <p class="mt-1 text-[13px] text-fg3">The kids you're booking lessons for.</p>
-
-        <div id="children-list" class="mt-5 space-y-3"></div>
-        <p id="children-empty" class="mt-5 hidden rounded-xl border border-dashed border-border2 p-6 text-center text-[14px] text-fg3">
-          No children added yet. Click <span class="font-medium text-fg2">“Add child”</span> to get started.
-        </p>
-      </section>
-
-      <!-- ── Tutor dashboard (tutors only) ── -->
-      <section id="tutor-section" class="hidden rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h2 class="text-[17px] font-semibold">My lesson slots</h2>
-            <p id="tutor-instrument" class="mt-1 text-[13px] text-fg3"></p>
+          <div class="flex items-center gap-3">
+            <button id="add-child-btn"
+              class="rounded-lg bg-beak px-4 py-2 text-[13px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+              + Add child
+            </button>
+            <svg class="chev h-5 w-5 flex-none text-fg3" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <button id="add-slot-btn"
-            class="flex-none rounded-lg bg-beak px-4 py-2 text-[13px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
-            + Add slot
-          </button>
+        </summary>
+        <div class="border-t border-border p-6 sm:p-8">
+          <p class="text-[13px] text-fg3">The kids you're booking lessons for.</p>
+          <div id="children-list" class="mt-4 space-y-3"></div>
+          <p id="children-empty" class="mt-4 hidden rounded-xl border border-dashed border-border2 p-6 text-center text-[14px] text-fg3">
+            No children added yet. Click <span class="font-medium text-fg2">“Add child”</span> to get started.
+          </p>
         </div>
+      </details>
 
-        <!-- shown if this account's email isn't linked to a tutor row -->
-        <div id="tutor-unlinked" class="mt-5 hidden rounded-xl border border-dashed border-border2 p-6 text-[14px] text-fg3">
-          Your account isn't linked to a tutor profile yet. Make sure the email on your
-          <span class="font-medium text-fg2">tutors</span> record matches <span id="tutor-unlinked-email" class="font-medium text-fg2"></span>,
-          or ask the team to set it up.
+      <!-- ── Tutor dashboard (tutors only) — open by default ── -->
+      <details id="tutor-section" open class="hidden overflow-hidden rounded-2xl border border-border bg-surface">
+        <summary class="flex items-center justify-between gap-3 p-6 sm:p-8">
+          <h2 class="text-[17px] font-semibold">My lesson slots</h2>
+          <div class="flex items-center gap-3">
+            <button id="add-slot-btn"
+              class="flex-none rounded-lg bg-beak px-4 py-2 text-[13px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
+              + Add slot
+            </button>
+            <svg class="chev h-5 w-5 flex-none text-fg3" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </summary>
+        <div class="border-t border-border p-6 sm:p-8">
+          <p id="tutor-instrument" class="text-[13px] text-fg3"></p>
+
+          <!-- shown if this account's email isn't linked to a tutor row -->
+          <div id="tutor-unlinked" class="mt-4 hidden rounded-xl border border-dashed border-border2 p-6 text-[14px] text-fg3">
+            Your account isn't linked to a tutor profile yet. Make sure the email on your
+            <span class="font-medium text-fg2">tutors</span> record matches <span id="tutor-unlinked-email" class="font-medium text-fg2"></span>,
+            or ask the team to set it up.
+          </div>
+
+          <div id="slots-list" class="mt-4 space-y-3"></div>
+          <p id="slots-empty" class="mt-4 hidden rounded-xl border border-dashed border-border2 p-6 text-center text-[14px] text-fg3">
+            No slots yet. Click <span class="font-medium text-fg2">“Add slot”</span> to open a lesson time for booking.
+          </p>
         </div>
-
-        <div id="slots-list" class="mt-5 space-y-3"></div>
-        <p id="slots-empty" class="mt-5 hidden rounded-xl border border-dashed border-border2 p-6 text-center text-[14px] text-fg3">
-          No slots yet. Click <span class="font-medium text-fg2">“Add slot”</span> to open a lesson time for booking.
-        </p>
-      </section>
+      </details>
     </div>
   </main>
 
@@ -232,16 +263,19 @@
   <!-- ── ADD SLOT MODAL (tutors) ── -->
   <div id="slot-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
     <div class="w-full max-w-sm rounded-2xl bg-surface p-7 shadow-2xl">
-      <h3 class="text-[18px] font-semibold">Add a lesson slot</h3>
-      <p class="mt-1 text-[13px] text-fg3">Open a 1-hour time for a student to book.</p>
+      <h3 class="text-[18px] font-semibold">Add lesson slots</h3>
+      <p class="mt-1 text-[13px] text-fg3">Pick a start time, then add every date you want to open it on.</p>
       <form id="slot-form" class="mt-5 space-y-4">
-        <div>
-          <label class="lbl" for="slot-date">Date <span class="text-beak">*</span></label>
-          <input id="slot-date" type="date" required class="field" />
-        </div>
         <div>
           <label class="lbl" for="slot-time">Start time <span class="text-beak">*</span></label>
           <input id="slot-time" type="time" required class="field" />
+        </div>
+        <div>
+          <label class="lbl">Date(s) <span class="text-beak">*</span></label>
+          <div id="slot-dates" class="space-y-2"></div>
+          <button type="button" id="add-date-btn"
+            class="mt-2 text-[13px] font-medium text-face hover:underline">+ Add another date</button>
+          <p class="mt-1 text-[12px] text-fg4">The same start time will be opened on each date.</p>
         </div>
         <p id="slot-msg" class="hidden text-[13px] text-red-500"></p>
         <div class="flex gap-3 pt-1">
@@ -251,7 +285,7 @@
           </button>
           <button type="submit" id="slot-save"
             class="flex-1 rounded-lg bg-beak py-2.5 text-[14px] font-semibold text-[#08090a] transition hover:bg-beakdeep">
-            Add slot
+            Add slot(s)
           </button>
         </div>
       </form>
@@ -291,10 +325,13 @@
 
       // Show the right section for the role
       if (role === 'tutor') {
+        document.getElementById('page-label').textContent = 'Dashboard'
         document.getElementById('tutor-section').classList.remove('hidden')
         initTutor()
       } else {
+        document.getElementById('lessons-section').classList.remove('hidden')
         document.getElementById('children-section').classList.remove('hidden')
+        loadLessons()
         loadChildren()
       }
 
@@ -329,6 +366,55 @@
       document.getElementById('pw2').value = ''
       showMsg('pw-msg', 'Password updated ✓', true)
     })
+
+    // ─────────────── My lessons: load + cancel ───────────────
+    async function loadLessons() {
+      const { data: lessons, error } = await db
+        .from('bookings')
+        .select('id, slot_id, child_name, instrument, tutor_name, lesson_date, lesson_time')
+        .eq('parent_id', currentUser.id)
+        .order('lesson_date', { ascending: true })
+
+      const list = document.getElementById('lessons-list')
+      const empty = document.getElementById('lessons-empty')
+      list.innerHTML = ''
+      if (error) { list.innerHTML = `<p class="text-[14px] text-red-500">Couldn't load lessons: ${esc(error.message)}</p>`; return }
+      if (!lessons.length) { empty.classList.remove('hidden'); return }
+      empty.classList.add('hidden')
+
+      lessons.forEach(l => {
+        const when = fmtLesson(l.lesson_date, l.lesson_time)
+        const card = document.createElement('div')
+        card.className = 'flex items-center justify-between gap-3 rounded-xl border border-border bg-bg p-4'
+        card.innerHTML = `
+          <div class="min-w-0">
+            <div class="text-[15px] font-semibold text-fg">${esc(l.instrument || 'Lesson')}${l.tutor_name ? ` with ${esc(l.tutor_name)}` : ''}</div>
+            <div class="text-[13px] text-fg3">${esc(when)}${l.child_name ? ' · ' + esc(l.child_name) : ''}</div>
+          </div>
+          <button data-cancel="${l.id}" data-slot="${l.slot_id}"
+            class="flex-none rounded-md border border-border2 px-3 py-1.5 text-[13px] font-medium text-red-500 transition hover:bg-red-50">Cancel</button>`
+        list.appendChild(card)
+      })
+
+      list.querySelectorAll('[data-cancel]').forEach(btn =>
+        btn.addEventListener('click', () => cancelLesson(btn.dataset.cancel, btn.dataset.slot)))
+    }
+
+    async function cancelLesson(bookingId, slotId) {
+      if (!confirm('Cancel this lesson? The time slot will reopen for others to book.')) return
+      const { error } = await db.from('bookings').delete().eq('id', bookingId)
+      if (error) { alert("Couldn't cancel: " + error.message); return }
+      // Free the slot back up
+      await db.from('slots').update({ is_booked: false }).eq('id', slotId)
+      loadLessons()
+    }
+
+    function fmtLesson(date, time) {
+      if (!date) return 'Date TBD'
+      const d = new Date(date + 'T' + (time || '00:00:00'))
+      const day = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+      return time ? `${day} · ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : day
+    }
 
     // ─────────────── Children: load + render ───────────────
     async function loadChildren() {
@@ -376,7 +462,7 @@
     // ─────────────── Children: add / edit modal ───────────────
     const childModal = document.getElementById('child-modal')
 
-    document.getElementById('add-child-btn').addEventListener('click', () => openChildModal(null))
+    document.getElementById('add-child-btn').addEventListener('click', (e) => { e.stopPropagation(); openChildModal(null) })
     document.getElementById('child-cancel').addEventListener('click', closeChildModal)
     childModal.addEventListener('click', e => { if (e.target === childModal) closeChildModal() })
 
@@ -515,31 +601,52 @@
       loadSlots()
     }
 
-    // Add-slot modal
+    // Add-slot modal — one start time, one or more dates
     const slotModal = document.getElementById('slot-modal')
-    document.getElementById('add-slot-btn').addEventListener('click', () => {
+
+    function addDateRow(value = '') {
+      const row = document.createElement('div')
+      row.className = 'flex items-center gap-2'
+      const input = document.createElement('input')
+      input.type = 'date'; input.required = true; input.value = value
+      input.className = 'field slot-date-input'
+      const rm = document.createElement('button')
+      rm.type = 'button'; rm.textContent = '✕'; rm.setAttribute('aria-label', 'Remove date')
+      rm.className = 'flex-none rounded-md border border-border2 px-2.5 py-2 text-[13px] text-fg4 transition hover:bg-surface2'
+      rm.addEventListener('click', () => row.remove())
+      row.append(input, rm)
+      document.getElementById('slot-dates').appendChild(row)
+    }
+
+    document.getElementById('add-slot-btn').addEventListener('click', (e) => {
+      e.stopPropagation()                       // don't toggle the collapsible header
       if (!tutorRow) return
       document.getElementById('slot-form').reset()
+      document.getElementById('slot-dates').innerHTML = ''
+      addDateRow()                              // start with one date field
       document.getElementById('slot-msg').classList.add('hidden')
       slotModal.classList.remove('hidden'); slotModal.classList.add('flex')
     })
+    document.getElementById('add-date-btn').addEventListener('click', () => addDateRow())
     document.getElementById('slot-cancel').addEventListener('click', closeSlotModal)
     slotModal.addEventListener('click', e => { if (e.target === slotModal) closeSlotModal() })
     function closeSlotModal() { slotModal.classList.add('hidden'); slotModal.classList.remove('flex') }
 
     document.getElementById('slot-form').addEventListener('submit', async e => {
       e.preventDefault()
-      const date = document.getElementById('slot-date').value
       const time = document.getElementById('slot-time').value   // "HH:MM"
+      const dates = [...new Set([...document.querySelectorAll('.slot-date-input')].map(i => i.value).filter(Boolean))]
+      const msg = document.getElementById('slot-msg')
+      if (!time)         { msg.textContent = 'Pick a start time.'; msg.classList.remove('hidden'); return }
+      if (!dates.length) { msg.textContent = 'Add at least one date.'; msg.classList.remove('hidden'); return }
+
+      // One slot row per date, all at the same start time
+      const rows = dates.map(d => ({ tutor_id: tutorRow.id, date: d, start_time: time + ':00', is_booked: false }))
       const btn = document.getElementById('slot-save')
       btn.disabled = true; btn.textContent = 'Adding…'
-      const { error } = await db.from('slots').insert({
-        tutor_id: tutorRow.id, date, start_time: time + ':00', is_booked: false,
-      })
-      btn.disabled = false; btn.textContent = 'Add slot'
-      if (error) {
-        const m = document.getElementById('slot-msg'); m.textContent = error.message; m.classList.remove('hidden'); return
-      }
+      const { error } = await db.from('slots').insert(rows)
+      btn.disabled = false; btn.textContent = 'Add slot(s)'
+      if (error) { msg.textContent = error.message; msg.classList.remove('hidden'); return }
       closeSlotModal(); loadSlots()
     })
 

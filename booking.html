@@ -133,7 +133,18 @@
 
       <form id="booking-form" class="mt-6 space-y-4">
 
-        <div class="grid grid-cols-2 gap-3">
+        <!-- Logged-in parents: pick a saved child -->
+        <div id="b-child-select-wrap" class="hidden">
+          <label class="mb-1 block text-[13px] font-medium text-fg2">Child <span class="text-beak">*</span></label>
+          <select id="b-child-select"
+            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20"></select>
+          <p id="b-no-children" class="mt-2 hidden text-[13px] text-fg3">
+            You haven't added a child yet. <a href="account.html" class="font-medium text-face hover:underline">Add one in your account →</a>
+          </p>
+        </div>
+
+        <!-- Guests: type child info -->
+        <div id="b-child-typed" class="grid grid-cols-2 gap-3">
           <div>
             <label class="mb-1 block text-[13px] font-medium text-fg2">Child's name <span class="text-beak">*</span></label>
             <input id="b-child-name" type="text" required placeholder="First and last"
@@ -146,16 +157,18 @@
           </div>
         </div>
 
-        <div>
-          <label class="mb-1 block text-[13px] font-medium text-fg2">Parent / guardian name <span class="text-beak">*</span></label>
-          <input id="b-parent-name" type="text" required placeholder="Your full name"
-            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-[13px] font-medium text-fg2">Your email <span class="text-beak">*</span></label>
-          <input id="b-parent-email" type="email" required placeholder="you@example.com"
-            class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+        <!-- Guests: parent contact -->
+        <div id="b-parent-fields" class="space-y-4">
+          <div>
+            <label class="mb-1 block text-[13px] font-medium text-fg2">Parent / guardian name <span class="text-beak">*</span></label>
+            <input id="b-parent-name" type="text" required placeholder="Your full name"
+              class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+          </div>
+          <div>
+            <label class="mb-1 block text-[13px] font-medium text-fg2">Your email <span class="text-beak">*</span></label>
+            <input id="b-parent-email" type="email" required placeholder="you@example.com"
+              class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[14px] outline-none transition focus:border-beak focus:ring-2 focus:ring-beak/20" />
+          </div>
         </div>
 
         <div>
@@ -207,6 +220,41 @@
 
     let calendar    = null   // the FullCalendar instance
     let selectedSlot = null  // the slot the user clicked
+    let currentUser = null   // set if the visitor is logged in
+    let myChildren  = []     // their saved children (logged-in parents)
+
+    // If logged in, switch the booking form to "pick a saved child" mode
+    ;(async function detectUser() {
+      const { data: { session } } = await db.auth.getSession()
+      if (!session) return
+      currentUser = session.user
+
+      const { data: kids } = await db
+        .from('children').select('id, name, age').order('created_at', { ascending: true })
+      myChildren = kids || []
+
+      const sel = document.getElementById('b-child-select')
+      sel.innerHTML = myChildren
+        .map(k => `<option value="${k.id}">${escHtml(k.name)}${k.age ? ` (age ${k.age})` : ''}</option>`).join('')
+
+      // Show the saved-child picker; hide the typed-info fields
+      document.getElementById('b-child-select-wrap').classList.remove('hidden')
+      document.getElementById('b-child-typed').classList.add('hidden')
+      document.getElementById('b-parent-fields').classList.add('hidden')
+      ;['b-child-name', 'b-child-age', 'b-parent-name', 'b-parent-email']
+        .forEach(id => { document.getElementById(id).required = false })
+
+      if (!myChildren.length) {
+        document.getElementById('b-no-children').classList.remove('hidden')
+        sel.required = false
+      } else {
+        sel.required = true
+      }
+    })()
+
+    function escHtml(s) {
+      return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    }
 
     // ─────────────────────────────────────────
     // STEP 1: User picks an instrument
@@ -274,7 +322,7 @@
         backgroundColor: '#f5c451',
         borderColor:     '#e9a93b',
         textColor:       '#08090a',
-        extendedProps:   { tutorName: tutor.name, instrument },
+        extendedProps:   { tutorName: tutor.name, instrument, date: slot.date, startTime: slot.start_time },
       }))
 
       // 4. Find the first slot's date so the calendar opens there
@@ -346,11 +394,34 @@
       btn.textContent = 'Booking…'
       btn.disabled    = true
 
-      const childName   = document.getElementById('b-child-name').value.trim()
-      const childAge    = parseInt(document.getElementById('b-child-age').value)
-      const parentName  = document.getElementById('b-parent-name').value.trim()
-      const parentEmail = document.getElementById('b-parent-email').value.trim()
-      const notes       = document.getElementById('b-notes').value.trim()
+      // Gather details. Logged-in parents pick a saved child; guests type it in.
+      const ev = selectedSlot.event
+      const ep = ev?.extendedProps || {}
+      let childName, childAge = null, childId = null, parentName, parentEmail, parentId = null
+
+      if (currentUser) {
+        if (!myChildren.length) {
+          showFormError('Please add a child in your account first.')
+          btn.textContent = 'Confirm booking'; btn.disabled = false; return
+        }
+        const child = myChildren.find(k => k.id === document.getElementById('b-child-select').value)
+        if (!child) {
+          showFormError('Please choose a child.')
+          btn.textContent = 'Confirm booking'; btn.disabled = false; return
+        }
+        childName  = child.name
+        childAge   = child.age ?? null
+        childId    = child.id
+        parentName = currentUser.user_metadata?.full_name || currentUser.email
+        parentEmail = currentUser.email
+        parentId   = currentUser.id
+      } else {
+        childName   = document.getElementById('b-child-name').value.trim()
+        childAge    = parseInt(document.getElementById('b-child-age').value) || null
+        parentName  = document.getElementById('b-parent-name').value.trim()
+        parentEmail = document.getElementById('b-parent-email').value.trim()
+      }
+      const notes = document.getElementById('b-notes').value.trim()
 
       // 1. Mark the slot as booked so no one else can grab it
       const { error: slotErr } = await db
@@ -365,7 +436,7 @@
         return
       }
 
-      // 2. Save the booking details
+      // 2. Save the booking details (with parent/child links + display fields)
       const { error: bookingErr } = await db
         .from('bookings')
         .insert({
@@ -375,6 +446,12 @@
           parent_name:  parentName,
           parent_email: parentEmail,
           notes:        notes || null,
+          parent_id:    parentId,
+          child_id:     childId,
+          instrument:   ep.instrument || null,
+          tutor_name:   ep.tutorName || null,
+          lesson_date:  ep.date || null,
+          lesson_time:  ep.startTime || null,
         })
 
       if (bookingErr) {
@@ -384,11 +461,7 @@
         return
       }
 
-      // 3. Fire off the confirmation email.
-      //    This is "best-effort": the booking is already saved, so even if
-      //    the email fails (e.g. testing from a local file), we still show
-      //    success. Capture the slot details BEFORE removing the event.
-      const ev = selectedSlot.event
+      // 3. Fire off the confirmation email (best-effort — booking already saved).
       sendConfirmationEmail({
         parentEmail, parentName, childName, childAge,
         instrument: ev?.extendedProps?.instrument || '',

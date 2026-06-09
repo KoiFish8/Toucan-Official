@@ -543,8 +543,11 @@
         if (profile && profile.role) role = profile.role
       } catch (e) { /* ignore — fall back to parent */ }
 
-      // Tutors don't book lessons → turn "Book a lesson" into "Dashboard"
+      // Tutors get a single "Dashboard" entry: hide the redundant "My account"
+      // (inline style, because the desktop link's `sm:block` would override a `hidden` class)
+      // and relabel the primary button to "Dashboard".
       if (role === 'tutor') {
+        document.querySelectorAll('[data-auth="in"]').forEach(el => { el.style.display = 'none' })
         document.querySelectorAll('[data-nav="primary"]').forEach(a => {
           a.textContent = 'Dashboard'
           a.setAttribute('href', 'account.html')
